@@ -4,6 +4,7 @@ from label_studio_sdk import project
 import numpy as np
 import pandas as pd
 from os.path import exists
+from collections.abc import Iterable
 
 
 # Wrapper function for data download and import. It checks if a *.csv file is present and handles the data download and
@@ -11,9 +12,10 @@ from os.path import exists
 #
 #   overwrite: Boolean value which determines if the available csv files would be overwritten by new ones
 #              (means DataDownload is used, even though the data is locally available)
-def DataImport(overwrite: bool = False):
+def DataImport(overwrite: bool = False) -> pd.DataFrame:
     """
     Wrapper function for data download and import. It checks if a *.csv file is present and handles the data download and data transformation if it's not.
+
     :param overwrite: Boolean value which determines if the available csv files would be overwritten by new ones (means DataDownload is used, even though the data is locally available)
     :return: DataFrame
     """
@@ -49,9 +51,9 @@ def DataImport(overwrite: bool = False):
 # After four label stages are matched to the text, one obtains a DataFrame with one column for text and four columns
 # for the label stages.
 # This DataFrame is then saved as csv and can be loaded at a later point in time.
-def DataDownload():
+def DataDownload() -> pd.DataFrame:
     """
-    Function which covers the data download and transformation. Therefore the raw data is fetched from the server
+    Function which covers the data download and transformation. Therefore, the raw data is fetched from the server
     (requires VPN). Afterwards two helper functions are created, one which basically an element-wise application of
     str.contains to a list. The other helper function contains the logic required for the label selection if more
     (or less) than 4 labels are available for one text (=Question/Answer). Then a dictionary for the raw_data is created,
@@ -76,6 +78,7 @@ def DataDownload():
     After four label stages are matched to the text, one obtains a DataFrame with one column for text and four columns
     for the label stages.
     This DataFrame is then saved as csv and can be loaded at a later point in time.
+
     :return: DataFrame
     """
     LABEL_STUDIO_URL = 'http://132.231.59.226:8080'  # this address needs to be the same as the address the label-studio is hosted on.
@@ -86,9 +89,10 @@ def DataDownload():
     pro = project.Project.get_from_id(ls, "1")
     tasks = project.Project.get_labeled_tasks(pro)
 
-    def arrayContains(x: list, y:str):
+    def arrayContains(x: Iterable, y:str) -> Iterable:
         """
         Checks of an (str) element of a list contains y
+
         :param x: List or iterable where each element is a str
         :param y: str
         :return: List of bools

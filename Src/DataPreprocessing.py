@@ -22,6 +22,7 @@ from nltk.stem import WordNetLemmatizer
 def dataCheck(data: pd.DataFrame, keepNA: str = False, keepOldIDs: str = False):
     """
     Checks the data for missing values (na) and (optionally) removes them.
+
     :param data: data object (pd.DataFrame)
     :param keepNA: the rows containing nas are not dropped, the function then only returns the na count per column and number or rows containing at least one na
     :param keepOldIDs: the pd.dropna function drops the rows containing nas, but does not change the indexing, which leads to missing index values. Therefore, for loops iterating over row-indices will not work anymore. Therefore, the index is replaces by a new index. If the old index is import it can be saved as column of the DataFrame
@@ -63,6 +64,7 @@ def textPreprocessing(data: pd.DataFrame, input_col: str = 'text', keepSteps: bo
         2) removes punctuation (output column of this step: 'proText_CP')
         3) removes stopwords (output column of this step: 'proText_CPS')
         4) Lemmitazation (stemming) of the tokens (output column of this step: 'proText_CPSL')
+
     :param data: data object (pd.DataFrame)
     :param input_col: name of the column containing the original text
     :param keepSteps: Boolean-Value which determines if the columns which results after each of the four steps are dropped or kept
@@ -104,6 +106,7 @@ def textCapitalisation(data: pd.DataFrame, input_col: str = 'text', output_col: 
     function which returns an array of strings. Each element in this array of strings is created from one element of the
     text column to which the str.lower function is applied. This procedure basically leads to an elementwise application
     of the str.lower function. The results are then saved in a new column.
+
     :param data: Data object (pd.DataFrame)
     :param input_col: Name of the column containing the strings of the previous step.
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
@@ -135,6 +138,7 @@ def textRmPunctuaion(data: pd.DataFrame, input_col: str = 'proText_C', output_co
     is removed (or rather replaced by '') in each text. Additionally, double spaces are replaced, which could result from
     the removal of punctuation (e.x. "We spend 100$ on xy." => "We spend  on xy"). Afterwards leading and trailing
     spaces are removed from the texts.
+
     :param data: Data object (pd.DataFrame)
     :param input_col: Name of the column containing the strings of the previous step
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
@@ -175,6 +179,7 @@ def textRmStopwords(data: pd.DataFrame, input_col ='proText_CP', output_col ='pr
     that some special characters where not removed correctly, therefore the punctuation is removed again.
     After that the resulting word list and word frequency's in the corpus where analysed (upper 5% of word frequencies)
     and a list of additional stopwords (with high frequencies) was created, which are then removed separately.
+
     :param data: Data object (pd.DataFrame)
     :param input_col: Name of the column containing the strings of the previous step.
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
@@ -226,6 +231,7 @@ def textLemmatization(data, input_col ='proText_CPS', output_col ='proText_CPSL'
     """
     Function which covers lemmatization. Again the nltk packages is used here. Each element in the text columns is again
     seperated into its tokens and then the stem of the corresponding token is returned and combined back to a string.
+
     :param data: Data object (pd.DataFrame)
     :param input_col: Name of the column containing the strings of the previous step.
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
