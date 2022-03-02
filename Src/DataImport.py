@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from os.path import exists
 from collections.abc import Iterable
+from Src.prompt import prompt
 
 
 # Wrapper function for data download and import. It checks if a *.csv file is present and handles the data download and
@@ -20,8 +21,10 @@ def DataImport(overwrite: bool = False) -> pd.DataFrame:
     :return: DataFrame
     """
     if not exists("Data/all_data.csv") or overwrite:
+        prompt("Starting data download")
         DataDownload()
 
+    prompt("Starting data import")
     data = pd.read_csv("Data/all_data.csv", index_col = 0)
     return data
 

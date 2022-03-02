@@ -5,6 +5,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import SpaceTokenizer
 from nltk.stem import WordNetLemmatizer
+from Src.prompt import prompt
 
 
 # Checks the data for missing values (na) and (optionally) removes them.
@@ -33,7 +34,7 @@ def dataCheck(data: pd.DataFrame, keepNA: str = False, keepOldIDs: str = False) 
     rowwiseIsNA = np.vectorize(pd.isna)
     rowwiseNA = rowwiseIsNA(data)
     numRemovedRows = sum([any(row) for row in rowwiseNA])
-    print(f"There will be {numRemovedRows} rows removed")
+    prompt(f"There will be {numRemovedRows} rows removed")
 
     if not keepNA:
         data = data.dropna(axis = 0)
@@ -72,7 +73,7 @@ def textPreprocessing(data: pd.DataFrame, input_col: str = 'text', keepSteps: bo
     :return: Data Frame
     """
     data = textCapitalisation(data)
-    data = textRmPunctuaion(data)
+    data = textRmPunctuation(data)
     data = textRmStopwords(data)
     data = textLemmatization(data)
 
@@ -112,6 +113,7 @@ def textCapitalisation(data: pd.DataFrame, input_col: str = 'text', output_col: 
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
     :return: DataFrame which includes a text colum where the punctuation was removed
     """
+    prompt("Starting removal of capitalization")
     rmCap = np.vectorize(str.lower)
     data[output_col] = rmCap(data[input_col])
 
@@ -131,7 +133,7 @@ def textCapitalisation(data: pd.DataFrame, input_col: str = 'text', output_col: 
 #   output_col: Name of the column which will contain the texts after the application of the current
 #               step/transformation.
 #
-def textRmPunctuaion(data: pd.DataFrame, input_col: str = 'proText_C', output_col: str = 'proText_CP') -> pd.DataFrame:
+def textRmPunctuation(data: pd.DataFrame, input_col: str = 'proText_C', output_col: str = 'proText_CP') -> pd.DataFrame:
     """
     Function which covers the removal of punctuation. Therefore, the punctuation, digits from the strings library and some
     costume strings are used. With the help of the maketrans and translate function each punctuation and digit character
@@ -144,6 +146,7 @@ def textRmPunctuaion(data: pd.DataFrame, input_col: str = 'proText_C', output_co
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
     :return: DataFrame which includes a text colum where the punctuation was removed
     """
+    prompt("Starting removal of punctuation")
     for s in range(data.shape[0]):
         data.loc[s, output_col] = data.loc[s, input_col].translate(str.maketrans({".": ". ", ",": ", ", "?": "? ", "!": "! "}))
         data.loc[s, output_col] = data.loc[s, output_col].translate(
@@ -191,6 +194,7 @@ def textRmStopwords(data: pd.DataFrame, input_col ='proText_CP', output_col ='pr
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
     :return: DataFrame which includes a text colum where the stopwords were removed
      """
+    prompt("Starting removal of stopwords")
     nltk.download('stopwords')
     nltk.download('punkt')
 
@@ -213,12 +217,12 @@ def textRmStopwords(data: pd.DataFrame, input_col ='proText_CP', output_col ='pr
             str.maketrans('', '', string.punctuation + string.digits + "’"))
         data.loc[s, output_col] = str(data.loc[s, output_col]).replace('  ', ' ')
 
-    additinoal_stopwords = ["were", "us", "going", "thats", "well", "weve", "one", "also", "q", "–", "still", "its",
+    additional_stopwords = ["were", "us", "going", "thats", "well", "weve", "one", "also", "q", "–", "still", "its",
                             "g", "theyre", "may", "ill", "id", "dont", "ive", "cant", "theyve", "im", "youre", "hi"]
 
     for s in range(data.shape[0]):
         tokens = tk.tokenize(data.loc[s, output_col])
-        tokens_noStop = [word for word in tokens if not word in additinoal_stopwords]
+        tokens_noStop = [word for word in tokens if not word in additional_stopwords]
         data.loc[s, output_col] = (" ").join(tokens_noStop)
 
     return data
@@ -243,6 +247,7 @@ def textLemmatization(data: pd.DataFrame, input_col: str ='proText_CPS', output_
     :param output_col: Name of the column which will contain the texts after the application of the current step/transformation.
     :return: DataFrame which includes a text colum where the stemming was done
     """
+    prompt("Starting lemmatization")
     nltk.download('wordnet')
     nltk.download('omw-1.4')
 
