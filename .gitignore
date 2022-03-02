@@ -134,3 +134,6 @@ usage.statistics.xml
 /shelf
 *.iws
 /.idea
+
+# Data Files because they are to large
+Data/GloVe_CoOcMatrix.csv
