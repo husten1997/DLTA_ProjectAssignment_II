@@ -7,6 +7,7 @@ import pandas as pd
 from Src.DataImport import DataImport
 from Src.DataPreprocessing import textPreprocessing
 from Src.DataPreprocessing import dataCheck
+from Src.GloVe import GloVe
 
 #%% Data Import
 data = DataImport()
@@ -16,6 +17,9 @@ data = dataCheck(data)
 
 #%% Data Preprocessing
 data = textPreprocessing(data)
+
+#%%
+context_matrix, target_matrix = GloVe(data['text'], epochs = 10)
 
 
 

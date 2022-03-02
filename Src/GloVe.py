@@ -5,6 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 from os.path import exists
 import matplotlib.pylab as plt
+from Src.prompt import prompt
 
 
 def generateContextDic(corpus: Iterable, window: int = 5) -> dict:
@@ -52,7 +53,7 @@ def generateCoOccurrenceMatrix(context_dic: dict):
     return matrix
 
 
-def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_bias: float = 0.00002, epochs: int = 20, set_seed: int = None, use_weights: bool = False, x_max = 100, alpha = 3/4, word_embedding_dim = 20):
+def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_bias: float = 0.00002, epochs: int = 20, set_seed: int = None, use_weights: bool = False, x_max = 100, alpha = 3/4, word_embedding_dim = 300):
     """
     Function which handles the GloVe fitting.
 
@@ -69,8 +70,10 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
     :return: tuple of context-word-embedding and target-word-embedding matrix
     """
     if not exists("Data/GloVe_CoOcMatrix.csv") or overwrite:
+        prompt("Starting generation of Co-Occurrence Matrix")
         cooc_matrix = generateCoOccurrenceMatrix(generateContextDic(corpus))
     else:
+        prompt("Starting import of Co-Occurrence Matrix")
         cooc_matrix = pd.read_csv("Data/GloVe_CoOcMatrix.csv", index_col = 0)
 
     cooc_matrix = cooc_matrix + 1
@@ -78,11 +81,13 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
     if set_seed is not None:
         np.random.seed(set_seed)
 
+    prompt("Starting random initialization of parameters")
     target_matrix = np.random.normal(size = len(cooc_matrix.index) * word_embedding_dim, scale = 0.25).reshape(len(cooc_matrix.index), word_embedding_dim)
     context_matrix = np.random.normal(size = len(cooc_matrix.index) * word_embedding_dim, scale = 0.25).reshape(len(cooc_matrix.index), word_embedding_dim)
     bias_context_vec = np.random.normal(size = len(cooc_matrix.index), scale = 0.25).reshape(len(cooc_matrix.index), 1)
     bias_target_vec = np.random.normal(size=len(cooc_matrix.index), scale=0.25).reshape(len(cooc_matrix.index), 1)
-    iota = np.matrix([1 for i in range(len(cooc_matrix.index))]).reshape(len(cooc_matrix.index), 1)
+    iota = np.ones((len(cooc_matrix.index), 1))
+    #iota = np.matrix([1 for i in range(len(cooc_matrix.index))]).reshape(len(cooc_matrix.index), 1)
 
     target_matrix = np.array(target_matrix, dtype = np.float64)
     context_matrix = np.array(context_matrix, dtype=np.float64)
@@ -94,6 +99,7 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
             return 1
 
     if use_weights:
+        prompt("Starting the calculation of weights")
         weights = np.matrix([[weighting(float(e), x_max, alpha) for e in row] for row in cooc_matrix.values])
     else:
         weights = np.ones(cooc_matrix.shape)
@@ -103,6 +109,7 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
 
         return J
 
+    prompt("Starting calculation")
     loss_series = [calLoss(weights, cooc_matrix, target_matrix, context_matrix, bias_context_vec, bias_target_vec)]
 
     for e in tqdm(range(epochs)):
@@ -122,14 +129,13 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
 
     #print(loss_series)
     plt.plot(pd.Series(loss_series).T)
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Loss Series")
     plt.show()
 
     return context_matrix, target_matrix
 
-#%%
-
-
-# GloVe(data.loc[:1000, "text"], overwrite = False, eta = 0.00002)
 
 
 
