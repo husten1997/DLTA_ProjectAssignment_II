@@ -19,7 +19,7 @@ from nltk.stem import WordNetLemmatizer
 #               the index is replaces by a new index. If the old index is import it can be saved as column of
 #               the DataFrame
 
-def dataCheck(data: pd.DataFrame, keepNA: str = False, keepOldIDs: str = False):
+def dataCheck(data: pd.DataFrame, keepNA: str = False, keepOldIDs: str = False) -> pd.DataFrame:
     """
     Checks the data for missing values (na) and (optionally) removes them.
 
@@ -145,8 +145,14 @@ def textRmPunctuaion(data: pd.DataFrame, input_col: str = 'proText_C', output_co
     :return: DataFrame which includes a text colum where the punctuation was removed
     """
     for s in range(data.shape[0]):
-        data.loc[s, output_col] = data.loc[s, input_col].translate(
+        data.loc[s, output_col] = data.loc[s, input_col].translate(str.maketrans({".": ". ", ",": ", ", "?": "? ", "!": "! "}))
+        data.loc[s, output_col] = data.loc[s, output_col].translate(
             str.maketrans('', '', string.punctuation + string.digits + "–" + "‘"))  # .replace("'", "")
+
+        data.loc[s, output_col] = str(data.loc[s, output_col]).replace('      ', ' ')
+        data.loc[s, output_col] = str(data.loc[s, output_col]).replace('     ', ' ')
+        data.loc[s, output_col] = str(data.loc[s, output_col]).replace('    ', ' ')
+        data.loc[s, output_col] = str(data.loc[s, output_col]).replace('   ', ' ')
         data.loc[s, output_col] = str(data.loc[s, output_col]).replace('  ', ' ')
 
     rmLeadSpace = np.vectorize(str.lstrip)
@@ -170,7 +176,7 @@ def textRmPunctuaion(data: pd.DataFrame, input_col: str = 'proText_C', output_co
 #   output_col: Name of the column which will contain the texts after the application of the current
 #               step/transformation.
 #
-def textRmStopwords(data: pd.DataFrame, input_col ='proText_CP', output_col ='proText_CPS'):
+def textRmStopwords(data: pd.DataFrame, input_col ='proText_CP', output_col ='proText_CPS') -> pd.DataFrame:
     """
     Function which covers the removal of stopwords. For that the nltk packages is used which contains a list
     of common (english) stopwords. To this list were some obviously missing words added. Because of the previous step,
@@ -227,7 +233,7 @@ def textRmStopwords(data: pd.DataFrame, input_col ='proText_CP', output_col ='pr
 #   output_col: Name of the column which will contain the texts after the application of the current
 #               step/transformation.
 #
-def textLemmatization(data, input_col ='proText_CPS', output_col ='proText_CPSL'):
+def textLemmatization(data: pd.DataFrame, input_col: str ='proText_CPS', output_col: str ='proText_CPSL') -> pd.DataFrame:
     """
     Function which covers lemmatization. Again the nltk packages is used here. Each element in the text columns is again
     seperated into its tokens and then the stem of the corresponding token is returned and combined back to a string.
