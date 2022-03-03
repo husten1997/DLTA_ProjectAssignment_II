@@ -19,7 +19,7 @@ data = dataCheck(data)
 data = textPreprocessing(data)
 
 #%% GloVe
-context_matrix, target_matrix = GloVe(data['text'], epochs = 20)
+context_matrix, target_matrix = GloVe(data['text'], epochs = 40, eta=0.0001)
 
 
 
