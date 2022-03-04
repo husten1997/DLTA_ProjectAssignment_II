@@ -259,3 +259,23 @@ def textLemmatization(data: pd.DataFrame, input_col: str ='proText_CPS', output_
         data.loc[s, output_col] = (" ").join([lemmatizer.lemmatize(w) for w in tokens])
 
     return data
+
+
+def dataSelection(data: pd.DataFrame, label_stage: int, doc_type: str = 'question'):
+    """
+    Function which handles the filtering of the data.
+
+    :param data: DataFrame of the data
+    :param label_stage: Integer value of the label stage (range from 1 to 3)
+    :param doc_type: Type of the document (range 'question', 'answer')
+    :return: returns a DataFrame with the filtered data
+    """
+    label_stage_str = f"label_l{label_stage}"
+    type = {'question': 'QID', 'answer': 'AID'}
+    type_label = {'question': 'Question', 'answer': 'Answer'}
+    label_str = f"{type_label[doc_type]}_{label_stage}"
+
+    selection_id = data['label_id'].str.contains(type[doc_type])
+    selection_label = data[label_stage_str].str.contains(label_str)
+
+    return data.loc[[x&y for x, y in zip(selection_id, selection_label)], :]
