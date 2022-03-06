@@ -10,4 +10,4 @@ def tf_idf(corpus: Iterable):
     mat_tfidf = tfidf.toarray()
     df_tfidf = pd.DataFrame(data=mat_tfidf,columns=tfidf_vec.get_feature_names())
 
-    return mat_tfidf, df_tfidf
+    return mat_tfidf

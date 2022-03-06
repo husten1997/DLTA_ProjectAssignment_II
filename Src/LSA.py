@@ -41,9 +41,3 @@ def plotExplainedVariance(steps, list_variance_explained):
     plt.title("Explained Variance by n-components")
     plt.show()
 
-# sources used:
-# https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html
-# https://www.kaggle.com/rajmehra03/topic-modelling-using-lda-and-lsa-in-sklearn
-# https://stackoverflow.com/questions/69091520/determine-the-correct-number-of-topics-using-latent-semantic-analysis
-# https://medium.com/swlh/truncated-singular-value-decomposition-svd-using-amazon-food-reviews-891d97af5d8d
-# (https://github.com/priyagunjate/Word-Vectors-using-Truncated-SVD/blob/master/Assignment11--version1.ipynb)
