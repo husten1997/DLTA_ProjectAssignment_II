@@ -27,6 +27,12 @@ data = dataSelection(data, label_stage=1, doc_type='question')
 #%%
 corpus = data['text']
 
+#%% td-idf
+mat_tfidf = tf_idf(corpus)
+
+#%% LSA
+doc_mat_lsa = LSA(mat_tfidf)
+
 #%% GloVe
 context_matrix, target_matrix = GloVe(corpus, epochs = 40, eta=0.0001)
 

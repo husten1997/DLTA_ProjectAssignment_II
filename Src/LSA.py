@@ -3,6 +3,12 @@ from sklearn.decomposition import TruncatedSVD
 import matplotlib.pyplot as plt
 
 def LSA(input_mat: Iterable):
+    """
+    Function which generates a LSA representation of the corpus.
+
+    :param corpus: Iterable/list/array or pd.Series which holds the tf-idf matrix
+    :return: LSA matrix
+    """
 
     numb_topics = getNumbTopics(input_mat)
 
@@ -12,11 +18,17 @@ def LSA(input_mat: Iterable):
     return doc_mat_lsa
 
 def getNumbTopics(input_mat: Iterable):
+    """
+    Function which determines the appropriate number of components.
+
+    :param input_mat: Iterable/list/array or pd.Series which holds the tf-idf matrix
+    :return: Number of components
+    """
 
     list_var_explained = []
     numb_topics = 0
     flag = True
-    steps = [50, 100, 250, 500, 800, 1000, 1500, 2000, 2500]
+    steps = [50, 100, 250, 500, 800, 1000, 1200]
 
     for n in steps:
 
@@ -33,6 +45,12 @@ def getNumbTopics(input_mat: Iterable):
     return numb_topics
 
 def plotExplainedVariance(steps, list_variance_explained):
+    """
+    Function which plots the explained variance by n-components.
+
+    :param steps: List which holds different amounts of topics
+    :param list_variance_explained: List which holds the different explained variances
+    """
 
     plt.plot(steps, list_variance_explained)
     plt.axhline(y=0.7, color='g', linestyle='-')
@@ -40,10 +58,3 @@ def plotExplainedVariance(steps, list_variance_explained):
     plt.ylabel("Explained Variance")
     plt.title("Explained Variance by n-components")
     plt.show()
-
-# sources used:
-# https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.TruncatedSVD.html
-# https://www.kaggle.com/rajmehra03/topic-modelling-using-lda-and-lsa-in-sklearn
-# https://stackoverflow.com/questions/69091520/determine-the-correct-number-of-topics-using-latent-semantic-analysis
-# https://medium.com/swlh/truncated-singular-value-decomposition-svd-using-amazon-food-reviews-891d97af5d8d
-# (https://github.com/priyagunjate/Word-Vectors-using-Truncated-SVD/blob/master/Assignment11--version1.ipynb)
