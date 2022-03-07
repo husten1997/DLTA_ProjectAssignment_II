@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
-#from sklearn.metrics import roc_curve, plot_roc_curve
+from sklearn.metrics import roc_curve, plot_roc_curve
 
 
 def calculateConfusionMatrix(data_true: pd.Series, data_pred: pd.Series, freq: bool = True):
@@ -25,3 +25,25 @@ def calculateConfusionMatrix(data_true: pd.Series, data_pred: pd.Series, freq: b
 
 def plotROC(data_true: pd.Series, data_pred: pd.Series):
     None
+
+
+
+def roc_measure(class_dimension, doc_type, label_stage, y_hat):
+
+    y_coi = []
+
+    class_dimension = 1
+
+    doc_type = "Answer"
+    label_stage = "label_l1"
+
+    for doc in range(data.shape[0]):
+        #check if doc type is equal to the category of interest (coi)
+        try:
+            if data[label_stage][doc].startswith(doc_type) == True:
+
+                y_coi.append(data[label_stage][doc])
+        except:
+            pass
+
+
