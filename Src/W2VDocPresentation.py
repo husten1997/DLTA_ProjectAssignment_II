@@ -1,15 +1,13 @@
 import pandas as pd
 import tensorflow as tf
 
-def docPresentation(data, vector_size, embedding_matrix):
+def docPresentation(corpus, vector_size, embedding_matrix):
     '''
     :param data: raw data which includes the preprocessed text
     :param vector_size: the vector size which is used for the word embedding
     :param embedding_matrix: the matrix as result of the word embedding
     :return: matrix of the dimension docs x vector_size which has as input the sum of each vector_size dimension of the embedding matrix per document
     '''
-
-    corpus = data['text']
 
     #create list of unigrams in the overall corpus
     lst_corpus = []
@@ -29,13 +27,13 @@ def docPresentation(data, vector_size, embedding_matrix):
     #create vocab
     vocab = tokenizer.word_index
 
-    doc_presentation = pd.DataFrame(columns = [i for i in range(vector_size)], index = [i for i in range(corpus.shape[0])])
+    doc_presentation = pd.DataFrame(columns = [i for i in range(vector_size)], index = corpus.index)
 
     #compare tokens with words in the word embedding matrix
 
-    for corpora in range(data.shape[0]):
+    for doc in corpus.index:
 
-        sub_corpus = corpus[corpora]
+        sub_corpus = corpus[doc]
 
         sub_vocab = sub_corpus.split()
 
@@ -50,7 +48,7 @@ def docPresentation(data, vector_size, embedding_matrix):
                 except:
                     pass
 
-
-        doc_presentation.iloc[corpora,:] = sum_helper.sum()
+        #print(doc)
+        doc_presentation.loc[doc,:] = sum_helper.sum()
 
     return doc_presentation
