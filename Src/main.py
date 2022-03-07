@@ -36,5 +36,11 @@ doc_mat_lsa = LSA(mat_tfidf)
 #%% GloVe
 context_matrix, target_matrix = GloVe(corpus, epochs = 40, eta=0.0001)
 
+#%% word2vec
+w2v_embedding = w2v_matrix(corpus = corpus, window_size = 5,min_count = 5, sg = 1,vector_size = 300)
+
+#%% doc presentation of w2v
+w2v_doc = docPresentation(corpus = corpus, vector_size = 300, embedding_matrix = w2v_embedding)
+
 
 
