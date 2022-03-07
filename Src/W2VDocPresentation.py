@@ -36,20 +36,20 @@ def docPresentation(corpus, vector_size, embedding_matrix):
     for doc in corpus.index:
         sub_corpus = corpus[doc]
 
-    sub_vocab = sub_corpus.split()
+        sub_vocab = sub_corpus.split()
 
-    #helper list
-    sum_helper = pd.DataFrame(columns = [i for i in range(vector_size)], index = sub_vocab)
+        #helper list
+        sum_helper = pd.DataFrame(columns = [i for i in range(vector_size)], index = sub_vocab)
 
-    for voc in range(len(sub_vocab)):
-        for word in range(len(vocab.items())):
-            try:
-                if sub_vocab[voc] == embedding_matrix.index[word][0]:
-                    sum_helper.iloc[voc,:] = embedding_matrix.iloc[word,:]
-            except:
-                pass
+        for voc in range(len(sub_vocab)):
+            for word in range(len(vocab.items())):
+                try:
+                    if sub_vocab[voc] == embedding_matrix.index[word][0]:
+                        sum_helper.iloc[voc,:] = embedding_matrix.iloc[word,:]
+                except:
+                    pass
 
 
-    doc_presentation.iloc[doc,:] = sum_helper.sum()
+        doc_presentation.iloc[doc,:] = sum_helper.sum()
 
     return doc_presentation

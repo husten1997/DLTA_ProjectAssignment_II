@@ -11,6 +11,11 @@ from Src.DataPreprocessing import dataSelection
 from Src.tf_idf import tf_idf
 from Src.LSA import LSA
 from Src.GloVe import GloVe
+from Src.W2VWordEmbedding import w2v_matrix
+from Src.W2VDocPresentation import docPresentation
+
+
+
 
 #%% Data Import
 data = DataImport()
