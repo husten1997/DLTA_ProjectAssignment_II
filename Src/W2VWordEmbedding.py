@@ -1,15 +1,14 @@
-from gensim.models import Word2Vec
+import gensim
 import pandas as pd
 import string
 import tensorflow as tf
 import numpy as np
 
-
 ###########################
 ## Tensor representation ##
 ###########################
 
-def w2v_tensor(data, window_size, min_count, sg, vector_size):
+def w2v_tensor(window_size, min_count, sg, vector_size):
 
     '''
     :param data: data which includes the preprocessed text
@@ -22,9 +21,7 @@ def w2v_tensor(data, window_size, min_count, sg, vector_size):
 
     doc_tensor = []
 
-    for doc in range(data['text'].shape[0]):
-        corpus = data['text'][doc]
-
+    for doc in range(corpus.shape[0]):
         #create unigrams
         lst_corpus = corpus.split()
 
@@ -49,8 +46,8 @@ def w2v_tensor(data, window_size, min_count, sg, vector_size):
         #fit tokenizer
         tokenizer.fit_on_texts(lst_corpus)
 
-        #create vocab
-        vocab = tokenizer.word_index
+        #create sub vocab
+        sub_vocab = tokenizer.word_index
 
         #create raw version of final matrix
         embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.items())
@@ -74,7 +71,8 @@ def w2v_tensor(data, window_size, min_count, sg, vector_size):
 
 
 
-def w2v_matrix(data, window_size, min_count, sg, vector_size):
+
+def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
 
     '''
     :param data: data which includes the preprocessed text
@@ -84,9 +82,6 @@ def w2v_matrix(data, window_size, min_count, sg, vector_size):
     :param vector_size: vector_size which is used for the word embedding
     :return: word embedding matrix per document, represented as a matrix
     '''
-
-    corpus = data['text']
-    corpus
 
     #create unigrams
     lst_corpus = []
@@ -122,17 +117,6 @@ def w2v_matrix(data, window_size, min_count, sg, vector_size):
     #create vocab
     vocab = tokenizer.word_index
 
-
-
-    #Parameters for W2V model
-    vector_size = 300
-
-    #window size
-    #ToDo:  calculate window size based on the mean length of all sentences
-    window_size = 8
-    min_count = 1
-    sg = 1 #1 = skip-gram #0 is CBOW
-
     #create raw version of final matrix
     embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.items())
 
@@ -141,20 +125,20 @@ def w2v_matrix(data, window_size, min_count, sg, vector_size):
     w2v = gensim.models.word2vec.Word2Vec(lst_corpus,
                                           window=window_size, min_count=min_count, sg=sg,vector_size=vector_size)
 
-
     #initialize tokenizer
     tokenizer = tf.keras.preprocessing.text.Tokenizer(lower = True, split = " ",
                                                       oov_token = 'NaN')
-
     #fit tokenizer
     tokenizer.fit_on_texts(lst_corpus)
 
     #create vocab
     vocab = tokenizer.word_index
 
-
     for token in vocab.items():
         try:
+            #          prompt(f"calculate word embedding for the token {token}")
             embedding_matrix.loc[token] = w2v.wv[token[0]]
         except:
             pass
+
+    return embedding_matrix
