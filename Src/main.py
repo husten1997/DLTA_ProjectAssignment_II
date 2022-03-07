@@ -11,9 +11,6 @@ from Src.DataPreprocessing import dataSelection
 from Src.tf_idf import tf_idf
 from Src.LSA import LSA
 from Src.GloVe import GloVe
-from Src.W2VWordEmbedding import w2v_matrix
-from Src.W2VWordEmbedding import w2v_tensor
-from Src.W2VDocPresentation import docPresentation
 
 #%% Data Import
 data = DataImport()
@@ -39,7 +36,5 @@ doc_mat_lsa = LSA(mat_tfidf)
 #%% GloVe
 context_matrix, target_matrix = GloVe(corpus, epochs = 40, eta=0.0001)
 
-#%% word2vec
-embedding_matrix =
 
 
