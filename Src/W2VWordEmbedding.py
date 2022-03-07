@@ -49,8 +49,8 @@ def w2v_tensor(data, window_size, min_count, sg, vector_size):
         #fit tokenizer
         tokenizer.fit_on_texts(lst_corpus)
 
-        #create vocab
-        vocab = tokenizer.word_index
+        #create sub vocab
+        sub_vocab = tokenizer.word_index
 
         #create raw version of final matrix
         embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.items())
@@ -152,9 +152,10 @@ def w2v_matrix(data, window_size, min_count, sg, vector_size):
     #create vocab
     vocab = tokenizer.word_index
 
-
     for token in vocab.items():
         try:
             embedding_matrix.loc[token] = w2v.wv[token[0]]
         except:
             pass
+
+    return embedding_matrix

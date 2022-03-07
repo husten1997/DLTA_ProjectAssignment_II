@@ -1,6 +1,6 @@
 import pandas as pd
 
-def docPresentation(data, vector_size, embedding_matrix):
+def docPresentation(corpus, vector_size, embedding_matrix):
     '''
     :param data: raw data which includes the preprocessed text
     :param vector_size: the vector size which is used for the word embedding
@@ -8,11 +8,28 @@ def docPresentation(data, vector_size, embedding_matrix):
     :return: matrix of the dimension docs x vector_size which has as input the sum of each vector_size dimension of the embedding matrix per document
     '''
 
-    corpus = data['text']
+    #create unigrams
+    lst_corpus = []
+
+    for string in corpus:
+        lst_words = string.split()
+        lst_grams = [' '.join(lst_words[i:i+1])
+                     for i in range(0, len(lst_words), 1)]
+        lst_corpus.append(lst_grams)
+
+    #initialize tokenizer
+    tokenizer = tf.keras.preprocessing.text.Tokenizer(lower = True, split = " ",
+                                                      oov_token = 'NaN')
+
+    #fit tokenizer
+    tokenizer.fit_on_texts(lst_corpus)
+
+    #create vocab
+    vocab = tokenizer.word_index
 
     doc_presentation = pd.DataFrame(columns = [i for i in range(vector_size)], index = [i for i in range(corpus.shape[0])])
 
-    for corpora in range(data.shape[0]):
+    for corpora in range(corpus.shape[0]):
         sub_corpus = corpus[corpora]
 
         sub_vocab = sub_corpus.split()
