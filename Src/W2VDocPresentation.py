@@ -31,32 +31,26 @@ def docPresentation(data, vector_size, embedding_matrix):
 
     doc_presentation = pd.DataFrame(columns = [i for i in range(vector_size)], index = [i for i in range(corpus.shape[0])])
 
-
     #compare tokens with words in the word embedding matrix
 
     for corpora in range(data.shape[0]):
 
         sub_corpus = corpus[corpora]
 
-    for doc in corpus.index:
-        sub_corpus = corpus[doc]
+        sub_vocab = sub_corpus.split()
 
-    sub_vocab = sub_corpus.split()
+        #helper list
+        sum_helper = pd.DataFrame(columns = [i for i in range(vector_size)], index = sub_vocab)
 
-    #helper list
-    sum_helper = pd.DataFrame(columns = [i for i in range(vector_size)], index = sub_vocab)
-
-    for voc in range(len(sub_vocab)):
-        for word in range(len(vocab.items())):
-            try:
-                if sub_vocab[voc] == embedding_matrix.index[word][0]:
-                    sum_helper.iloc[voc,:] = embedding_matrix.iloc[word,:]
-            except:
-                pass
+        for voc in range(len(sub_vocab)):
+            for word in range(len(vocab.items())):
+                try:
+                    if sub_vocab[voc] ==  embedding_matrix.index[word][0]:
+                        sum_helper.iloc[voc,:] = embedding_matrix.iloc[word,:]
+                except:
+                    pass
 
 
-    doc_presentation.iloc[corpora,:] = sum_helper.sum()
-
-    doc_presentation.iloc[doc,:] = sum_helper.sum()
+        doc_presentation.iloc[corpora,:] = sum_helper.sum()
 
     return doc_presentation
