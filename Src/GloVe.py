@@ -134,7 +134,7 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
     plt.title("Loss Series")
     plt.show()
 
-    return context_matrix, target_matrix
+    return pd.DataFrame(context_matrix, index=cooc_matrix.index), pd.DataFrame(target_matrix, index =cooc_matrix.index)
 
 
 
