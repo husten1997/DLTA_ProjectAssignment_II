@@ -70,8 +70,6 @@ def w2v_tensor(window_size, min_count, sg, vector_size):
     return doc_tensor
 
 
-
-
 def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
 
     '''
@@ -92,21 +90,6 @@ def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
                      for i in range(0, len(lst_words), 1)]
         lst_corpus.append(lst_grams)
 
-    '''
-     ## detect bigrams and trigrams
-     bigrams_detector = gensim.models.phrases.Phrases(lst_corpus,
-                                                      delimiter=" ".encode(), min_count=min_count, threshold=10)
-     trigrams_detector = gensim.models.phrases.Phrases(bigrams_detector[lst_corpus],
-                                                       delimiter=" ".encode(), min_count=min_count, threshold=10)
-     
-     bigrams_detector = gensim.models.phrases.Phraser(bigrams_detector)
-     trigrams_detector = gensim.models.phrases.Phraser(trigrams_detector)
-     
-     lst_corpus = list(bigrams_detector[lst_corpus])
-     lst_corpus = list(trigrams_detector[lst_corpus])
-     '''
-
-
     #initialize tokenizer
     tokenizer = tf.keras.preprocessing.text.Tokenizer(lower = True, split = " ",
                                                       oov_token = 'NaN')
@@ -120,15 +103,13 @@ def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
     #create raw version of final matrix
     embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.keys())
 
-
     #initialize model
     w2v = gensim.models.word2vec.Word2Vec(lst_corpus,
                                           window=window_size, min_count=min_count, sg=sg,vector_size=vector_size)
 
-
     for token in vocab.keys():
         try:
-            #          prompt(f"calculate word embedding for the token {token}")
+            #prompt(f"calculate word embedding for the token {token}")
             embedding_matrix.loc[token] = w2v.wv[token]
         except:
             pass
