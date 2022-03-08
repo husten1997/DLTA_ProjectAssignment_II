@@ -50,7 +50,7 @@ def w2v_tensor(window_size, min_count, sg, vector_size):
         sub_vocab = tokenizer.word_index
 
         #create raw version of final matrix
-        embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.items())
+        embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.keys())
 
         #attach embedding_matrix to doc tensor
 
@@ -118,7 +118,7 @@ def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
     vocab = tokenizer.word_index
 
     #create raw version of final matrix
-    embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.items())
+    embedding_matrix = pd.DataFrame(columns = [i for i in range(vector_size)], index = vocab.keys())
 
 
     #initialize model
