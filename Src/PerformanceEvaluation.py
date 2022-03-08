@@ -46,7 +46,7 @@ def roc_measure(corpus,doc_type, data_pred):
     y_coi = []
 
     for label in range(len(corpus)):
-        y = int(corpus[label] == doc_type)
+        y = int(corpus.iloc[label] == doc_type)
         y_coi.append(y)
 
     #binarize predicted data with probability threshold
