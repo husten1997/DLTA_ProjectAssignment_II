@@ -324,8 +324,8 @@ def dataSplit(data: pd.DataFrame, selection_index, train_split_frac: float = 0.5
     data = data.loc[selection_index, :]
     data = data.sample(frac=1)
 
-    split_index = np.floor(train_split_frac * data.shape[0])
-    return data.loc[data.index < split_index, :], data.loc[data.index < split_index, :]
+    split_index = np.quantile(data.index, train_split_frac) # np.floor(train_split_frac * data.shape[0])
+    return data.loc[data.index < split_index, :], data.loc[data.index >= split_index, :]
 
 
 def generateEncodingMatrix(data: pd.Series) -> pd.DataFrame:

@@ -64,7 +64,7 @@ test_data = classifierNN(docTrain, docTest, glove_doc.loc[selection_index, :], d
 # Performance Evaluation
 conf_matrix = calculateConfusionMatrix(test_data['label_l1'], test_data['label_l1_NNpred'])
 
-roc_measure(dataTrain,'Question_1_Market_related', test_data)
+#roc_measure(dataTrain,'Question_1_Market_related', test_data)
 
 
 
