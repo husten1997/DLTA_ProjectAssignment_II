@@ -47,8 +47,8 @@ glove_doc = docPresentation_alt(corpus = corpus, embedding_matrix = context_matr
 w2v_embedding = w2v_matrix(corpus = corpus, window_size = 5,min_count = 1, sg = 1,vector_size = 300)
 
 #%% doc presentation of w2v
-w2v_doc = docPresentation(corpus = corpus, vector_size = 300, embedding_matrix = w2v_embedding)
-w2v_doc_alt = docPresentation_alt(corpus = corpus, embedding_matrix = w2v_embedding)
+#w2v_doc = docPresentation(corpus = corpus, vector_size = 300, embedding_matrix = w2v_embedding)
+w2v_doc_alt = docPresentation_alt(corpus = corpus, embedding_matrix = w2v_embedding, method = "average")
 #%% ClassifierNN
 
 # Data Prep
