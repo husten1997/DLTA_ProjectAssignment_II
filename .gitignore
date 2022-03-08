@@ -137,3 +137,4 @@ usage.statistics.xml
 
 # Data Files because they are to large
 Data/GloVe_CoOcMatrix.csv
+/classifierNN/
