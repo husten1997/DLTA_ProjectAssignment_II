@@ -279,3 +279,47 @@ def dataSelection(data: pd.DataFrame, label_stage: int, doc_type: str = 'questio
     selection_label = data[label_stage_str].str.contains(label_str)
 
     return data.loc[[x&y for x, y in zip(selection_id, selection_label)], :]
+
+
+def dataSample(data, method, n, col = 'label_l1'):
+    labels = np.unique(data[col])
+    label_counts = {}
+    for l in labels:
+        label_counts[l] = label_counts[l] = data[col].str.cat(sep = " ").split().count(str(l))
+
+    data_groups = {}
+    for l in labels:
+        data_groups[l] = data.loc[data[col] == l, :].index
+
+    selection_index = []
+    if method == "undersample":
+        n = min(label_counts.values())
+        for l in labels:
+            selection_index.extend(np.random.choice(data_groups[l], n))
+    elif method == "resample":
+        for l in labels:
+            selection_index.extend(np.random.choice(data_groups[l], n, replace = True))
+
+    return selection_index
+
+
+def dataSplit(data, selection_index, train_split_frac = 0.5):
+    data = data.loc[selection_index, :]
+    data = data.sample(frac=1)
+
+    split_index = np.floor(train_split_frac * data.shape[0])
+    return data.loc[data.index < split_index, :], data.loc[data.index < split_index, :]
+
+
+def generateEncodingMatrix(data):
+    labels = np.unique(data)
+    encoding_matrix = pd.DataFrame([[i, v] for i, v in enumerate(labels)], columns=['index', 'value'])
+    return encoding_matrix
+
+
+def dataEncoding(data, encoding_matrix):
+    return encoding_matrix.set_index('value').loc[data, 'index'].values
+
+
+def dataDecoder(data, encoding_matrix):
+    return encoding_matrix.set_index('index').loc[data, 'value'].values
