@@ -125,19 +125,11 @@ def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
     w2v = gensim.models.word2vec.Word2Vec(lst_corpus,
                                           window=window_size, min_count=min_count, sg=sg,vector_size=vector_size)
 
-    #initialize tokenizer
-    tokenizer = tf.keras.preprocessing.text.Tokenizer(lower = True, split = " ",
-                                                      oov_token = 'NaN')
-    #fit tokenizer
-    tokenizer.fit_on_texts(lst_corpus)
 
-    #create vocab
-    vocab = tokenizer.word_index
-
-    for token in vocab.items():
+    for token in vocab.keys():
         try:
             #          prompt(f"calculate word embedding for the token {token}")
-            embedding_matrix.loc[token] = w2v.wv[token[0]]
+            embedding_matrix.loc[token] = w2v.wv[token]
         except:
             pass
 

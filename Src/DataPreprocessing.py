@@ -186,3 +186,107 @@ def textLemmatization(data, input_col ='proText_CPS', output_col ='proText_CPSL'
         data.loc[s, output_col] = (" ").join([lemmatizer.lemmatize(w) for w in tokens])
 
     return data
+<<<<<<< Updated upstream
+=======
+
+
+def dataSelection(data: pd.DataFrame, label_stage: int, doc_type: str = 'question'):
+    """
+    Function which handles the filtering of the data.
+
+    :param data: DataFrame of the data
+    :param label_stage: Integer value of the label stage (range from 1 to 3)
+    :param doc_type: Type of the document (range 'question', 'answer')
+    :return: returns a DataFrame with the filtered data
+    """
+    label_stage_str = f"label_l{label_stage}"
+    type = {'question': 'QID', 'answer': 'AID'}
+    type_label = {'question': 'Question', 'answer': 'Answer'}
+    label_str = f"{type_label[doc_type]}_{label_stage}"
+
+    selection_id = data['label_id'].str.contains(type[doc_type])
+    selection_label = data[label_stage_str].str.contains(label_str)
+
+    return data.loc[[x&y for x, y in zip(selection_id, selection_label)], :]
+
+
+def dataSample(data: pd.DataFrame, method: str, n: int, col: str = 'label_l1'):
+    """
+    Handles the data sampling.
+
+    :param data: dataset
+    :param method: method of sampling ('undersample', 'resample')
+    :param n: desired length of sampled data (obsolete for undersampling because the number of samples of the smallest group is set as n)
+    :param col: name of the target column
+    :return: array of indices
+    """
+    labels = np.unique(data[col])
+    label_counts = {}
+    for l in labels:
+        label_counts[l] = label_counts[l] = data[col].str.cat(sep = " ").split().count(str(l))
+
+    data_groups = {}
+    for l in labels:
+        data_groups[l] = data.loc[data[col] == l, :].index
+
+    selection_index = []
+    if method == "undersample":
+        n = min(label_counts.values())
+        for l in labels:
+            selection_index.extend(np.random.choice(data_groups[l], n))
+    elif method == "resample":
+        for l in labels:
+            selection_index.extend(np.random.choice(data_groups[l], n, replace = True))
+
+    return selection_index
+
+
+def dataSplit(data: pd.DataFrame, selection_index, train_split_frac: float = 0.5):
+    """
+    Handls the splitting of data (data and document representation that is, every data as long the row-index matches the doc-index)
+
+    :param data: DataFrame of data
+    :param selection_index: selection_index (see dataSample)
+    :param train_split_frac: fraction of the data which should be considered for the train dataset
+    :return: tuple of train and test data
+    """
+    data = data.loc[selection_index, :]
+    data = data.sample(frac=1)
+
+    split_index = np.floor(train_split_frac * data.shape[0])
+    return data.loc[data.index < split_index, :], data.loc[data.index < split_index, :]
+
+
+def generateEncodingMatrix(data: pd.Series) -> pd.DataFrame:
+    """
+    Generates a DataFrame which holds a 'index' column (number) and a 'value' column (labels). Each column can be set as index and therefore a translation between labels and number representation is possible.
+
+    :param data: Series of labels
+    :return: DataFrame
+    """
+    labels = np.unique(data)
+    encoding_matrix = pd.DataFrame([[i, v] for i, v in enumerate(labels)], columns=['index', 'value'])
+    return encoding_matrix
+
+
+def dataEncoding(data: pd.Series, encoding_matrix: pd.DataFrame):
+    """
+    Handles the encoding (translation from text labels to number representation) of the labels.
+
+    :param data: Series of (text) labels
+    :param encoding_matrix: encoding_matrix (see generateEncodingMatrix)
+    :return: array of encoded data
+    """
+    return encoding_matrix.set_index('value').loc[data, 'index'].values
+
+
+def dataDecoder(data, encoding_matrix):
+    """
+    Handles the decoding (translation from number representation labels to text labels) of the labels.
+
+    :param data: array/Series of numbers
+    :param encoding_matrix: encoding_matrix (see generateEncodingMatrix)
+    :return: array of decoded data
+    """
+    return encoding_matrix.set_index('index').loc[data, 'value'].values
+>>>>>>> Stashed changes
