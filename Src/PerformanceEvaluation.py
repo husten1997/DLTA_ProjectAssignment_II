@@ -29,7 +29,7 @@ def plotROC(data_true: pd.Series, data_pred: pd.Series):
 
 
 
-def roc_measure(corpus,doc_type, data_pred):
+def roc_measure(data_true,doc_type, data_pred):
 
     '''
 
@@ -45,8 +45,8 @@ def roc_measure(corpus,doc_type, data_pred):
     #binarize the data
     y_coi = []
 
-    for label in range(len(corpus)):
-        y = int(corpus.iloc[label] == doc_type)
+    for label in range(data_true['text']):
+        y = int(data_true['text'].iloc[label] == doc_type)
         y_coi.append(y)
 
     #binarize predicted data with probability threshold
