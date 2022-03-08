@@ -32,10 +32,8 @@ def plotROC(data_true: pd.Series, data_pred: pd.Series):
 def roc_measure(data_true,doc_type, data_pred):
 
     '''
-
-    :param data: data with labeled text
+    :param data_true: data which includes the label column 'label_l1'
     :param doc_type: Question or Answer Label which shall be classified as 1
-    :param label_stage: stage of the classified labels
     :param data_pred: predictions of a classifier with probabilities as output
     :return: roc table, roc curve and area under the curve per probability
     '''
@@ -45,8 +43,8 @@ def roc_measure(data_true,doc_type, data_pred):
     #binarize the data
     y_coi = []
 
-    for label in range(data_true['text']):
-        y = int(data_true['text'].iloc[label] == doc_type)
+    for label in range(data_true.shape[0]):
+        y = int(data_true['label_l1'].iloc[label] == doc_type)
         y_coi.append(y)
 
     #binarize predicted data with probability threshold
