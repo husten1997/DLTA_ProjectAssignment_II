@@ -340,7 +340,7 @@ def generateEncodingMatrix(data: pd.Series) -> pd.DataFrame:
     return encoding_matrix
 
 
-def dataEncoding(data: pd.Sereis, encoding_matrix: pd.DataFrame):
+def dataEncoding(data: pd.Series, encoding_matrix: pd.DataFrame):
     """
     Handles the encoding (translation from text labels to number representation) of the labels.
 
