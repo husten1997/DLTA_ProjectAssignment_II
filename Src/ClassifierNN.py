@@ -31,7 +31,7 @@ def createModel(hp):
 
 
 def classifierNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, docRepresentation: pd.DataFrame, dataTrain: pd.DataFrame, dataTest: pd.DataFrame, data: pd.DataFrame, encoding_matrix: pd.DataFrame, label_col: str ='label_l1',
-                 epochs: int =20, prediction_suffix: str ="_NNpred") -> pd.DataFrame:
+                 epochs: int =20, prediction_suffix: str ="_NNpred", prob_suffix: str = "_NNprob") -> pd.DataFrame:
     """
     Wrapper function for the whole classification process by neural network.
 
@@ -56,10 +56,11 @@ def classifierNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, docReprese
 
     pred_data = model.predict(np.matrix(docRepresentation).astype('float32'))
     pred_data = np.array(pred_data).reshape(-1)
-    print(pred_data)
-    pred_data = np.floor(pred_data + 0.5).astype('int')
-    print(pred_data)
-    data[str(label_col + prediction_suffix)] = dataDecoder(pred_data, encoding_matrix)
+    #print(pred_data)
+    pred_data_groups = np.floor(pred_data + 0.5).astype('int')
+    #print(pred_data)
+    data[str(label_col + prediction_suffix)] = dataDecoder(pred_data_groups, encoding_matrix)
+    data[str(label_col + prob_suffix)] = pred_data
 
     return data
 

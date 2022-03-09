@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 
 
-def docPresentation_alt(corpus: pd.Series, embedding_matrix: pd.DataFrame) -> pd.DataFrame:
+def docPresentation_alt(corpus: pd.Series, embedding_matrix: pd.DataFrame, method: str = 'sum') -> pd.DataFrame:
     '''
     Function which converts the word embedding into a document representation.
 
@@ -19,12 +20,15 @@ def docPresentation_alt(corpus: pd.Series, embedding_matrix: pd.DataFrame) -> pd
     doc_presentation = pd.DataFrame(columns = [i for i in range(vector_size)], index = corpus.index)
 
 
-    for i, doc in zip(corpus.index, corpus):
+    for i, doc in tqdm(zip(corpus.index, corpus)):
 
         words = doc.split()
         sum_helper = embedding_matrix.loc[words, :]
 
         #print(sum_helper.sum(axis = 0))
-        doc_presentation.loc[i,:] = sum_helper.sum(axis = 0)
+        if method == "sum":
+            doc_presentation.loc[i,:] = sum_helper.sum(axis = 0)
+        elif method == "average":
+            doc_presentation.loc[i, :] = sum_helper.mean(axis=0)
 
     return doc_presentation
