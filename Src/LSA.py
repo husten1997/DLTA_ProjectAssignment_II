@@ -3,7 +3,7 @@ from sklearn.decomposition import TruncatedSVD
 import matplotlib.pyplot as plt
 import pandas as pd
 
-def LSA(input_mat: Iterable):
+def LSA(corpus: Iterable, input_mat: Iterable):
     """
     Function which generates a LSA representation of the corpus.
 
@@ -16,7 +16,7 @@ def LSA(input_mat: Iterable):
     lsa_model = TruncatedSVD(n_components=numb_topics, algorithm='arpack')
 
     mat_lsa = lsa_model.fit_transform(input_mat)
-    df_lsa = pd.DataFrame(data=mat_lsa)
+    df_lsa = pd.DataFrame(data=mat_lsa, index=corpus.index)
 
     return df_lsa
 

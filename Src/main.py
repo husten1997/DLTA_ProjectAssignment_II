@@ -38,7 +38,7 @@ corpus = data['text']
 mat_tfidf, tfidf_doc = tf_idf(corpus)
 
 #%% LSA
-lsa_doc = LSA(mat_tfidf)
+lsa_doc = LSA(corpus, mat_tfidf)
 
 #%% GloVe
 context_matrix, target_matrix = GloVe(corpus, epochs = 40, eta=0.0001)
@@ -50,7 +50,8 @@ w2v_embedding = w2v_matrix(corpus = corpus, window_size = 5,min_count = 5, sg = 
 #%% doc presentation of w2v
 w2v_doc = docPresentation(corpus = corpus, vector_size = 300, embedding_matrix = w2v_embedding)
 w2v_doc_alt = docPresentation_alt(corpus = corpus, embedding_matrix = w2v_embedding)
-#%% ClassifierNN
+
+#%% Classifier
 
 # Data Prep
 selection_index = dataSample(data, method = "undersample", n = 0)
@@ -59,18 +60,26 @@ encoding_matrix = generateEncodingMatrix(data['label_l1'])
 dataTrain, dataTest = dataSplit(data, selection_index)
 
 docTrain_tfidf, docTest_tfidf = dataSplit(tfidf_doc, selection_index)
+docTrain_lsa, docTest_lsa = dataSplit(lsa_doc, selection_index)
 docTrain_glove, docTest_glove = dataSplit(glove_doc, selection_index)
 
 # Classifier Fit
-test_data_tfidf = classifierLinear(docTrain_tfidf, tfidf_doc, dataTrain, data)
-test_data_glove = classifierNN(docTrain_glove, docTest_glove, glove_doc.loc[selection_index, :], dataTrain, dataTest, data.loc[selection_index, :], encoding_matrix)
+# Linear Classifier
+test_data_tfidf_lin = classifierLinear(docTrain_tfidf, tfidf_doc, dataTrain, data)
+test_data_lsa_lin = classifierLinear(docTrain_lsa, lsa_doc, dataTrain, data)
+# NN Classifier
+test_data_glove_nn = classifierNN(docTrain_glove, docTest_glove, glove_doc.loc[selection_index, :], dataTrain, dataTest, data.loc[selection_index, :], encoding_matrix)
+#TODO: AN: NN classifier for tdidf and lsa
 
 # Performance Evaluation
-conf_matrix_tfidf = calculateConfusionMatrix(test_data_tfidf['label_l1'], test_data_tfidf['label_l1_LINpred'])
-#TODO: roc_measure for linear classifier
+# Linear Classifier
+conf_matrix_tfidf_lin = calculateConfusionMatrix(test_data_tfidf_lin['label_l1'], test_data_tfidf_lin['label_l1_LINpred'])
+conf_matrix_lsa_lin = calculateConfusionMatrix(test_data_lsa_lin['label_l1'], test_data_lsa_lin['label_l1_LINpred'])
 
-conf_matrix_glove = calculateConfusionMatrix(test_data_glove['label_l1'], test_data_glove['label_l1_NNpred'])
-roc_measure(dataTrain,'Question_1_Market_related', test_data_glove)
+# NN Classifier
+conf_matrix_glove = calculateConfusionMatrix(test_data_glove_nn['label_l1'], test_data_glove_nn['label_l1_NNpred'])
+roc_measure(dataTrain,'Question_1_Market_related', test_data_glove_nn)
+#TODO: AN: confusion matrix for tdidf and lsa
 
 
 
