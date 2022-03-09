@@ -365,6 +365,13 @@ def dataDecoder(data, encoding_matrix):
 
 def oversampling(word_emebedding, labels, method):
 
+    '''
+    :param word_emebedding: word_embedding matrix
+    :param labels: labels from data
+    :param method: oversampling method
+    :return:
+    '''
+
     if method == 'random':
         oversampler = RandomOverSampler(random_state = 42)
         vectors, categories = oversampler.fit_resample(word_emebedding, labels)
