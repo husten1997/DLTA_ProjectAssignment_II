@@ -4,34 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from Src.DataPreprocessing import generateEncodingMatrix, dataEncoding, dataDecoder
+from Src.prompt import prompt
 
 
-def createModel(hp):
-    """
-    Handles the creation of the Neural Network, required for the keras tuner step.
-
-    :param hp: Hyper parameters of keras tuner
-    :return: NeuralNetwork
-    """
-    input_layer = tf.keras.layers.Input(shape=(300,))
-    output_layer = input_layer
-    output_layer = tf.keras.layers.Dense(hp.Choice('L1_Units', [100, 200, 300]),
-                                         activation=hp.Choice('L1_Act', ["relu", "tanh", "linear"]))(output_layer)
-    output_layer = tf.keras.layers.Dense(hp.Choice('L2_Units', [50, 100, 150]),
-                                         activation=hp.Choice('L2_Act', ["relu", "tanh", "linear"]))(output_layer)
-    output_layer = tf.keras.layers.Dense(hp.Choice('L3_Units', [25, 50, 75]),
-                                         activation=hp.Choice('L3_Act', ["relu", "tanh", "linear"]))(output_layer)
-    output_layer = tf.keras.layers.Dense(1, activation="sigmoid")(output_layer)
-
-    learning_rate = hp.Float("lr", min_value=1e-4, max_value=1e-2, sampling="log")
-    model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
-    model.compile(loss="binary_crossentropy", optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate))
-
-    return model
-
-
-def classifierNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, docRepresentation: pd.DataFrame, dataTrain: pd.DataFrame, dataTest: pd.DataFrame, data: pd.DataFrame, encoding_matrix: pd.DataFrame, label_col: str ='label_l1',
-                 epochs: int =20, prediction_suffix: str ="_NNpred", prob_suffix: str = "_NNprob") -> pd.DataFrame:
+def classifierNN(sampleTrain: pd.DataFrame, sampleTest: pd.DataFrame, docRepresentation: pd.DataFrame,  data: pd.DataFrame, encoding_matrix: pd.DataFrame, label_col: str ='label_l1',
+                 epochs: int =20, prediction_suffix: str ="_NNpred", prob_suffix: str = "_NNprob", batch_size = 128, project_name = "NNClassifier", plot_title = "") -> pd.DataFrame:
     """
     Wrapper function for the whole classification process by neural network.
 
@@ -47,12 +24,13 @@ def classifierNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, docReprese
     :param prediction_suffix: suffix for the prediction colum
     :return: dataframe with the original data plus the colum of predicted label data
     """
+    prompt("Starting NN Classifier")
     label_col_enc = label_col + "_enc"
-    dataTrain[label_col_enc] = dataEncoding(dataTrain[label_col], encoding_matrix)
-    dataTest[label_col_enc] = dataEncoding(dataTest[label_col], encoding_matrix)
+    sampleTrain[label_col_enc] = dataEncoding(sampleTrain['labels'], encoding_matrix)
+    sampleTest[label_col_enc] = dataEncoding(sampleTest['labels'], encoding_matrix)
     data[label_col_enc] = dataEncoding(data[label_col], encoding_matrix)
 
-    model = fitNN(docRepTrain, docRepTest, dataTrain[label_col_enc], dataTest[label_col_enc], epochs=epochs)
+    model = fitNN(sampleTrain['doc'], sampleTest['doc'], sampleTrain[label_col_enc], sampleTest[label_col_enc], epochs=epochs, batch_size=batch_size, project_name=project_name, plot_title = plot_title)
 
     pred_data = model.predict(np.matrix(docRepresentation).astype('float32'))
     pred_data = np.array(pred_data).reshape(-1)
@@ -65,7 +43,7 @@ def classifierNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, docReprese
     return data
 
 
-def fitNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, labelsTrain: pd.Series, labelsTest: pd.Series, epochs: int=20):
+def fitNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, labelsTrain: pd.Series, labelsTest: pd.Series, epochs: int=20, batch_size = 128, project_name = "NNClassifier", plot_title = ""):
     """
     Handles the fitting of the keras tuner and selects the best model. This model is then trained and returned.
 
@@ -76,23 +54,61 @@ def fitNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, labelsTrain: pd.S
     :param epochs: number of epochs
     :return: tensorflow model
     """
+
+    docRepTrain = np.matrix([np.array(i) for i in docRepTrain])
+    docRepTest = np.matrix([np.array(i) for i in docRepTest])
+
+    labelsTrain = labelsTrain.to_numpy()
+    labelsTest = labelsTest.to_numpy()
+
+    input_shape = docRepTrain.shape[1]
+
+    def createModel(hp):
+        """
+        Handles the creation of the Neural Network, required for the keras tuner step.
+
+        :param hp: Hyper parameters of keras tuner
+        :return: NeuralNetwork
+        """
+        nonlocal input_shape
+        input_layer = tf.keras.layers.Input(shape=(input_shape,))  #
+        output_layer = input_layer
+        output_layer = tf.keras.layers.Dense(hp.Choice('L1_Units', [100, 200, 300]),
+                                             activation=hp.Choice('L1_Act', ["relu", "tanh", "linear"]))(output_layer)
+        output_layer = tf.keras.layers.Dense(hp.Choice('L2_Units', [50, 100, 150]),
+                                             activation=hp.Choice('L2_Act', ["relu", "tanh", "linear"]))(output_layer)
+        output_layer = tf.keras.layers.Dense(hp.Choice('L3_Units', [25, 50, 75]),
+                                             activation=hp.Choice('L3_Act', ["relu", "tanh", "linear"]))(output_layer)
+        output_layer = tf.keras.layers.Dense(1, activation="sigmoid")(output_layer)
+
+        learning_rate = hp.Float("lr", min_value=1e-4, max_value=1e-2, sampling="log")
+        model = tf.keras.Model(inputs=input_layer, outputs=output_layer)
+        model.compile(loss="binary_crossentropy", optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate))
+
+        return model
+
+    prompt("Starting keras tuner")
     tuner = kt.BayesianOptimization(createModel, objective='val_loss', max_trials=5, overwrite=True,
-                                    project_name="classifierNN")
-    tuner.search(x=np.matrix(docRepTrain).astype('float32'), y=labelsTrain.factorize()[0].reshape(-1, 1), epochs=10,
-                 validation_data=(np.matrix(docRepTest).astype('float32'), labelsTest.factorize()[0].reshape(-1, 1)),
-                 batch_size=1024)
+                                    project_name=project_name) #, input_shape = docRepTrain.shape[1]
+    tuner.search(x=docRepTrain.astype('float32'), y=labelsTrain.reshape(-1, 1), epochs=10, #.factorize()[0]
+                 validation_data=(docRepTest.astype('float32'), labelsTest.reshape(-1, 1)), #.factorize()[0]
+                 batch_size=batch_size)
 
     classifier_model = tuner.get_best_models()[0]
 
-    history = classifier_model.fit(x=np.matrix(docRepTrain).astype('float32'), y=labelsTrain.factorize()[0].reshape(-1, 1),
+    prompt("Fitting best model")
+    history = classifier_model.fit(x=docRepTrain.astype('float32'), y=labelsTrain.reshape(-1, 1), #.factorize()[0]
                                    epochs=epochs,
                                    validation_data=(
-                                       np.matrix(docRepTest).astype('float32'), labelsTest.factorize()[0].reshape(-1, 1)),
-                                   batch_size=1024)
+                                       docRepTest.astype('float32'), labelsTest.reshape(-1, 1)), #.factorize()[0]
+                                   batch_size=batch_size)
 
     # History Plot
     plt.plot(history.history['loss'], label='loss')
     plt.plot(history.history['val_loss'], label='validation_loss')
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title(plot_title)
     plt.legend()
     plt.show()
 
