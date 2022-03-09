@@ -87,54 +87,5 @@ conf_matrix_glove = calculateConfusionMatrix(test_data_glove_nn['label_l1'], tes
 #roc test
 
 NN_w2v_pred = test_data_w2v_nn['label_l1_NNprob']
-roc_measure(data, NN_w2v_pred, encoding_matrix,True, 'w2v')
+roc_measure(data, NN_w2v_pred, encoding_matrix,True,'w2v')
 
-from sklearn.metrics import roc_curve, auc, roc_auc_score
-import matplotlib.pylab as plt
-
-def roc_measure(data_true,prop_pred, encoding_matrix, plot, plot_title):
-
-    '''
-    :param data_true: data which includes the label column 'label_l1'
-    :param doc_type: Question or Answer Label which shall be classified as 1
-    :param prop_pred: predictions of a classifier with probabilities as output
-    :return: roc table, roc curve and area under the curve per probability
-    '''
-
-    roc_table = pd.DataFrame(columns = ['threshold', 'TPR', 'FPR'], index = [i for i in range(100)])
-
-    #binarize the data
-    y_coi = []
-
-    for label in range(data.shape[0]):
-        y = int(data['label_l1'].iloc[label] == encoding_matrix.set_index('index').loc[1, 'value'])
-        y_coi.append(y)
-
-    #binarize predicted data with probability threshold
-    for threshold in range(101):
-
-        y_hat = []
-
-        for label in range(len(NN_w2v_pred)):
-            y = int(NN_w2v_pred.iloc[label] >= threshold/100)
-            y_hat.append(y)
-
-        fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
-
-        roc_table.loc[threshold] = threshold/100, fpr[1], tpr[1]
-        area_under_curve = roc_auc_score(y_coi, NN_w2v_pred)
-
-    if plot == True:
-        #plot ROC curve
-        plt.figure()
-        lw = 2
-        plt.plot(
-            roc_table['FPR'],
-            roc_table['TPR'],
-            lw = lw
-        )
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title(f'{plot_title}')
-
-    return area_under_curve
