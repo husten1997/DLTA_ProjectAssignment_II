@@ -29,7 +29,7 @@ def plotROC(data_true: pd.Series, data_pred: pd.Series):
 
 
 
-def roc_measure(data_true,prop_pred, encoding_matrix, plot, plot_title):
+def roc_measure(data, encoding_matrix, label_true, label_prob, plot_title, plot = True):
 
     '''
     :param data_true: data which includes the label column 'label_l1'
@@ -37,14 +37,15 @@ def roc_measure(data_true,prop_pred, encoding_matrix, plot, plot_title):
     :param prop_pred: predictions of a classifier with probabilities as output
     :return: roc table, roc curve and area under the curve per probability
     '''
-
+    data_true = data[label_true]
+    prop_pred = data[label_prob]
     roc_table = pd.DataFrame(columns = ['threshold', 'TPR', 'FPR'], index = [i for i in range(100)])
 
     #binarize the data
     y_coi = []
 
     for label in range(data_true.shape[0]):
-        y = int(data_true['label_l1'].iloc[label] == encoding_matrix.set_index('index').loc[1, 'value'])
+        y = int(data_true.iloc[label] == encoding_matrix.set_index('index').loc[1, 'value'])
         y_coi.append(y)
 
     #binarize predicted data with probability threshold
@@ -73,6 +74,7 @@ def roc_measure(data_true,prop_pred, encoding_matrix, plot, plot_title):
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title(f'{plot_title}')
+        plt.show()
 
     return area_under_curve
 
