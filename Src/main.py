@@ -48,8 +48,7 @@ glove_doc = docPresentation_alt(corpus = corpus, embedding_matrix = context_matr
 w2v_embedding = w2v_matrix(corpus = corpus, window_size = 5,min_count = 5, sg = 1,vector_size = 300)
 
 #%% doc presentation of w2v
-w2v_doc = docPresentation(corpus = corpus, vector_size = 300, embedding_matrix = w2v_embedding)
-w2v_doc_alt = docPresentation_alt(corpus = corpus, embedding_matrix = w2v_embedding)
+w2v_doc = docPresentation_alt(corpus = corpus, embedding_matrix = w2v_embedding)
 
 #%% Classifier
 
@@ -62,6 +61,8 @@ dataTrain, dataTest = dataSplit(data, selection_index)
 docTrain_tfidf, docTest_tfidf = dataSplit(tfidf_doc, selection_index)
 docTrain_lsa, docTest_lsa = dataSplit(lsa_doc, selection_index)
 docTrain_glove, docTest_glove = dataSplit(glove_doc, selection_index)
+docTrain_w2v, docTest_w2v = dataSplit(w2v_doc, selection_index)
+
 
 # Classifier Fit
 # Linear Classifier
@@ -69,6 +70,7 @@ test_data_tfidf_lin = classifierLinear(docTrain_tfidf, tfidf_doc, dataTrain, dat
 test_data_lsa_lin = classifierLinear(docTrain_lsa, lsa_doc, dataTrain, data)
 # NN Classifier
 test_data_glove_nn = classifierNN(docTrain_glove, docTest_glove, glove_doc.loc[selection_index, :], dataTrain, dataTest, data.loc[selection_index, :], encoding_matrix)
+
 #TODO: AN: NN classifier for tdidf and lsa
 
 # Performance Evaluation

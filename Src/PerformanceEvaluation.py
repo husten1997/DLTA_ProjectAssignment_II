@@ -29,7 +29,7 @@ def plotROC(data_true: pd.Series, data_pred: pd.Series):
 
 
 
-def roc_measure(data_true,doc_type, prop_pred, plot: bool, plot_title: str):
+def roc_measure(data_true,prop_pred, encoding_matrix, plot: bool, plot_title: str):
 
     '''
     :param data_true: data which includes the label column 'label_l1'
@@ -44,7 +44,7 @@ def roc_measure(data_true,doc_type, prop_pred, plot: bool, plot_title: str):
     y_coi = []
 
     for label in range(data_true.shape[0]):
-        y = int(data_true['label_l1'].iloc[label] == doc_type)
+        y = int(data_true['label_l1'].iloc[label] == encoding_matrix.set_index('index').loc[1, 'value'])
         y_coi.append(y)
 
     #binarize predicted data with probability threshold
