@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from sklearn.decomposition import TruncatedSVD
 import matplotlib.pyplot as plt
+import pandas as pd
 
 def LSA(input_mat: Iterable):
     """
@@ -13,9 +14,11 @@ def LSA(input_mat: Iterable):
     numb_topics = getNumbTopics(input_mat)
 
     lsa_model = TruncatedSVD(n_components=numb_topics, algorithm='arpack')
-    doc_mat_lsa = lsa_model.fit_transform(input_mat)
 
-    return doc_mat_lsa
+    mat_lsa = lsa_model.fit_transform(input_mat)
+    df_lsa = pd.DataFrame(data=mat_lsa)
+
+    return df_lsa
 
 def getNumbTopics(input_mat: Iterable):
     """
