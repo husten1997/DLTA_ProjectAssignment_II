@@ -6,6 +6,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import SpaceTokenizer
 from nltk.stem import WordNetLemmatizer
 from Src.prompt import prompt
+import imblearn
+from imblearn.over_sampling import RandomOverSampler, SMOTE, BorderlineSMOTE, ADASYN
 
 
 # Checks the data for missing values (na) and (optionally) removes them.
@@ -360,3 +362,19 @@ def dataDecoder(data, encoding_matrix):
     :return: array of decoded data
     """
     return encoding_matrix.set_index('index').loc[data, 'value'].values
+
+def oversampling(word_emebedding, labels, method):
+
+    if method == 'random':
+        oversampler = RandomOverSampler(random_state = 42)
+        vectors, categories = oversampler.fit_resample(word_emebedding, labels)
+
+    if method == 'SMOTE':
+        oversampler = SMOTE(random_state = 42)
+        vectors, categories = oversampler.fit_resample(word_emebedding, labels)
+
+    if method == 'BorderlineSMOTE':
+        oversampler = BorderlineSMOTE(random_state = 42)
+        vectors, categories = oversampler.fit_resample(word_emebedding, labels)
+
+    return vectors, categories
