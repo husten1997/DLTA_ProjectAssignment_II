@@ -283,7 +283,7 @@ def dataSelection(data: pd.DataFrame, label_stage: int, doc_type: str = 'questio
     return data.loc[[x&y for x, y in zip(selection_id, selection_label)], :]
 
 
-def dataSample(data: pd.DataFrame, method: str, n: int, col: str = 'label_l1'):
+def dataSample(documentRep: pd.DataFrame, data: pd.DataFrame, method: str, n: int, col: str = 'label_l1', folds = 10):
     """
     Handles the data sampling.
 
@@ -302,19 +302,48 @@ def dataSample(data: pd.DataFrame, method: str, n: int, col: str = 'label_l1'):
     for l in labels:
         data_groups[l] = data.loc[data[col] == l, :].index
 
-    selection_index = []
+    vectors = []
+    categories = []
     if method == "undersample":
         n = min(label_counts.values())
         for l in labels:
-            selection_index.extend(np.random.choice(data_groups[l], n))
+            # selection_index.extend(np.random.choice(data_groups[l], n))
+            vectors.extend(documentRep.loc[np.random.choice(data_groups[l], n, replace=True), :])
+            categories.extend(data.loc[np.random.choice(data_groups[l], n, replace=True), col])
+
     elif method == "resample":
         for l in labels:
-            selection_index.extend(np.random.choice(data_groups[l], n, replace = True))
+            #selection_index.extend(np.random.choice(data_groups[l], n, replace = True))
+            vectors.extend(documentRep.loc[np.random.choice(data_groups[l], n, replace = True), :] )
+            categories.extend(data.loc[np.random.choice(data_groups[l], n, replace = True), col] )
 
-    return selection_index
+    elif method == 'random':
+        oversampler = RandomOverSampler(random_state = 42)
+        vectors, categories = oversampler.fit_resample(documentRep, data[col])
+
+    elif method == 'SMOTE':
+        oversampler = SMOTE(random_state = 42)
+        vectors, categories = oversampler.fit_resample(documentRep, data[col])
+
+    elif method == 'BorderlineSMOTE':
+        oversampler = BorderlineSMOTE(random_state = 42)
+        vectors, categories = oversampler.fit_resample(documentRep, data[col])
+
+    data_sample = pd.DataFrame()
+    #vectors = pd.DataFrame(vectors)
+    #categories = pd.DataFrame(categories)
+    #return vectors, categories
+    n = len(categories)
+    fold_n = int(np.ceil(n / folds))
+    fold_vec = np.array([i+1 for i in range(folds)] * fold_n)
+    data_sample['doc'] = vectors.to_numpy().tolist()
+    data_sample['labels'] = categories
+    data_sample['fold'] = np.random.choice(fold_vec, n, replace = False)
+
+    return data_sample
 
 
-def dataSplit(data: pd.DataFrame, selection_index, train_split_frac: float = 0.5):
+def dataSplit(data: pd.DataFrame, test_fold = 10):
     """
     Handls the splitting of data (data and document representation that is, every data as long the row-index matches the doc-index)
 
@@ -323,11 +352,11 @@ def dataSplit(data: pd.DataFrame, selection_index, train_split_frac: float = 0.5
     :param train_split_frac: fraction of the data which should be considered for the train dataset
     :return: tuple of train and test data
     """
-    data = data.loc[selection_index, :]
     data = data.sample(frac=1)
 
-    split_index = np.quantile(data.index, train_split_frac) # np.floor(train_split_frac * data.shape[0])
-    return data.loc[data.index < split_index, :], data.loc[data.index >= split_index, :]
+    #split_index = np.quantile(data.index, train_split_frac) # np.floor(train_split_frac * data.shape[0])
+    dataTrain, dataTest = data.loc[data['fold'] != test_fold, :], data.loc[data['fold'] == test_fold, :]
+    return dataTrain, dataTest
 
 
 def generateEncodingMatrix(data: pd.Series) -> pd.DataFrame:
