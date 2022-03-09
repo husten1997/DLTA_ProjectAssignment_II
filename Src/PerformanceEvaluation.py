@@ -29,7 +29,7 @@ def plotROC(data_true: pd.Series, data_pred: pd.Series):
 
 
 
-def roc_measure(data_true,prop_pred, encoding_matrix, plot: bool, plot_title: str):
+def roc_measure(data_true,prop_pred, encoding_matrix, plot, plot_title):
 
     '''
     :param data_true: data which includes the label column 'label_l1'
@@ -53,7 +53,7 @@ def roc_measure(data_true,prop_pred, encoding_matrix, plot: bool, plot_title: st
         y_hat = []
 
         for label in range(len(prop_pred)):
-            y = int(prop_pred[label] >= threshold/100)
+            y = int(prop_pred.iloc[label] >= threshold/100)
             y_hat.append(y)
 
         fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
