@@ -15,6 +15,7 @@ from Src.W2VWordEmbedding import w2v_matrix
 from Src.W2VDocPresentation import docPresentation
 from Src.DocPresentation import docPresentation_alt
 from Src.DataPreprocessing import dataSample, dataSplit, generateEncodingMatrix
+from Src.DataPreprocessing import  oversampling
 from Src.PerformanceEvaluation import calculateConfusionMatrix, roc_measure
 from Src.ClassifierLinear import classifierLinear
 from Src.ClassifierNN import classifierNN
@@ -45,7 +46,7 @@ context_matrix, target_matrix = GloVe(corpus, epochs = 40, eta=0.0001)
 glove_doc = docPresentation_alt(corpus = corpus, embedding_matrix = context_matrix + target_matrix)
 
 #%% word2vec
-w2v_embedding = w2v_matrix(corpus = corpus, window_size = 5,min_count = 5, sg = 1,vector_size = 300)
+w2v_embedding = w2v_matrix(corpus = corpus, window_size = 5,min_count = 1, sg = 1,vector_size = 300)
 
 #%% doc presentation of w2v
 w2v_doc = docPresentation_alt(corpus = corpus, embedding_matrix = w2v_embedding)
@@ -88,4 +89,9 @@ conf_matrix_glove = calculateConfusionMatrix(test_data_glove_nn['label_l1'], tes
 NN_w2v_pred = test_data_w2v_nn['label_l1_NNprob']
 roc_measure(data, NN_w2v_pred, encoding_matrix,True,'w2v')
 
+#oversampling example
 
+word_embedding = w2v_doc
+labels = data['label_l1']
+
+vectors, labels = oversampling(word_embedding, labels, 'SMOTE')
