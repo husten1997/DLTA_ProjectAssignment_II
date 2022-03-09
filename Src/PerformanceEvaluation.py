@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import confusion_matrix
-from sklearn.metrics import roc_curve, plot_roc_curve, roc_auc_score
+from sklearn.metrics import roc_curve, auc, roc_auc_score
 import matplotlib.pylab as plt
 
 
@@ -38,7 +38,7 @@ def roc_measure(data_true,doc_type, data_pred):
     :return: roc table, roc curve and area under the curve per probability
     '''
 
-    roc_table = pd.DataFrame(columns = ["threshold", "TPR", "FPR", "AUC"], index = [i for i in range(100)])
+    roc_table = pd.DataFrame(columns = ["threshold", "TPR", "FPR"], index = [i for i in range(100)])
 
     #binarize the data
     y_coi = []
@@ -58,7 +58,8 @@ def roc_measure(data_true,doc_type, data_pred):
 
         fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
 
-        roc_table.loc[threshold] = threshold/100, fpr[1], tpr[1], roc_auc_score(y_true = y_coi, y_score = y_hat)
+        roc_table.loc[threshold] = threshold/100, fpr[1], tpr[1]
+        auc = auc(x = roc_table['FPR'], y = roc_table['TPR'])
 
     #plot ROC curve
     plt.figure()
@@ -71,7 +72,7 @@ def roc_measure(data_true,doc_type, data_pred):
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
 
-    return roc_table
+    return auc
 
 
 
