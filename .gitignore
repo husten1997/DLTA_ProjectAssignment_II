@@ -138,3 +138,8 @@ usage.statistics.xml
 # Data Files because they are to large
 Data/GloVe_CoOcMatrix.csv
 /classifierNN/
+/NN_glove/
+/NN_lsa/
+/NN_tfidf/
+/NN_w2v/
+/NNClassifier/
