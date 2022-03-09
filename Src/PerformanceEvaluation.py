@@ -29,16 +29,16 @@ def plotROC(data_true: pd.Series, data_pred: pd.Series):
 
 
 
-def roc_measure(data_true,doc_type, data_pred):
+def roc_measure(data_true,doc_type, prop_pred, plot: bool, plot_title: str):
 
     '''
     :param data_true: data which includes the label column 'label_l1'
     :param doc_type: Question or Answer Label which shall be classified as 1
-    :param data_pred: predictions of a classifier with probabilities as output
+    :param prop_pred: predictions of a classifier with probabilities as output
     :return: roc table, roc curve and area under the curve per probability
     '''
 
-    roc_table = pd.DataFrame(columns = ["threshold", "TPR", "FPR"], index = [i for i in range(100)])
+    roc_table = pd.DataFrame(columns = ['threshold', 'TPR', 'FPR'], index = [i for i in range(100)])
 
     #binarize the data
     y_coi = []
@@ -48,31 +48,33 @@ def roc_measure(data_true,doc_type, data_pred):
         y_coi.append(y)
 
     #binarize predicted data with probability threshold
-    for threshold in range(100):
+    for threshold in range(101):
 
         y_hat = []
 
-        for label in range(len(data_pred)):
-            y = int(data_pred[label] >= threshold/100)
+        for label in range(len(prop_pred)):
+            y = int(prop_pred[label] >= threshold/100)
             y_hat.append(y)
 
         fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
 
         roc_table.loc[threshold] = threshold/100, fpr[1], tpr[1]
-        auc = auc(x = roc_table['FPR'], y = roc_table['TPR'])
+        area_under_curve = roc_auc_score(y_coi, prop_pred)
 
-    #plot ROC curve
-    plt.figure()
-    lw = 2
-    plt.plot(
-        roc_table["FPR"],
-        roc_table["TPR"],
-        lw = lw
-    )
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
+    if plot == True:
+        #plot ROC curve
+        plt.figure()
+        lw = 2
+        plt.plot(
+            roc_table['FPR'],
+            roc_table['TPR'],
+            lw = lw
+        )
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title(f'{plot_title}')
 
-    return auc
+    return area_under_curve
 
 
 
