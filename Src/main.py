@@ -85,7 +85,7 @@ conf_matrix_glove = calculateConfusionMatrix(test_data_glove_nn['label_l1'], tes
 
 
 #roc test
-
 NN_w2v_pred = test_data_w2v_nn['label_l1_NNprob']
 roc_measure(data, NN_w2v_pred, encoding_matrix,True,'w2v')
+
 
