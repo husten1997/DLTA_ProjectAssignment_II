@@ -2,15 +2,18 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
-def classifierLinear(sampleTrain: pd.DataFrame, docRepresentation: pd.DataFrame, data: pd.DataFrame,
+def classifierLinear(sampleTrain: pd.DataFrame, docRepresentation: pd.DataFrame, data: pd.Series,
                      label_col: str ='label_l1', prediction_suffix: str = "_LINpred", prob_suffix: str = "_LINprob"):
 
-    docRepTrain = sampleTrain['doc']
-    docRepTrain = np.matrix([np.array(i) for i in docRepTrain])
+    unlist = lambda x: np.array([np.array(i) for i in np.array(x)])
+
+    docRepresentation = unlist(docRepresentation)
+    docRepTrain = unlist(sampleTrain['doc'])
+    #docRepTrain = np.array([np.array(i) for i in docRepTrain])
 
 
-    X_train = np.matrix(docRepTrain)
-    X_test = np.matrix(docRepresentation)
+    X_train = np.array(docRepTrain)
+    X_test = np.array(docRepresentation)
 
     y_train = sampleTrain['labels']
 
@@ -22,7 +25,9 @@ def classifierLinear(sampleTrain: pd.DataFrame, docRepresentation: pd.DataFrame,
 
     pred_data_prob_marketrel = np.array(pred_data_prob)[:, 1]
 
-    data[str(label_col + prediction_suffix)] = pred_data
-    data[str(label_col + prob_suffix)] = pred_data_prob_marketrel
+    data_ = pd.DataFrame()
+    data_[label_col] = data
+    data_[str(label_col + prediction_suffix)] = pred_data
+    data_[str(label_col + prob_suffix)] = pred_data_prob_marketrel
 
-    return data
+    return data_

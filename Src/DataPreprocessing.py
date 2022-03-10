@@ -283,15 +283,16 @@ def dataSelection(data: pd.DataFrame, label_stage: int, doc_type: str = 'questio
     return data.loc[[x&y for x, y in zip(selection_id, selection_label)], :]
 
 
-def dataSample(documentRep: pd.DataFrame, data: pd.DataFrame, method: str, n: int, col: str = 'label_l1', folds = 10):
+def dataSample(documentRep: pd.DataFrame, data: pd.DataFrame, method: str, n: int, col: str = 'label_l1', folds = 10) -> pd.DataFrame:
     """
     Handles the data sampling.
 
+    :param documentRep: Document representation
     :param data: dataset
     :param method: method of sampling ('undersample', 'resample')
     :param n: desired length of sampled data (obsolete for undersampling because the number of samples of the smallest group is set as n)
     :param col: name of the target column
-    :return: array of indices
+    :return: DataFrame of document representation in 'doc'-column and labels in 'labels'-column
     """
     labels = np.unique(data[col])
     label_counts = {}
@@ -345,7 +346,7 @@ def dataSample(documentRep: pd.DataFrame, data: pd.DataFrame, method: str, n: in
 
 def dataSplit(data: pd.DataFrame, test_fold = 10):
     """
-    Handls the splitting of data (data and document representation that is, every data as long the row-index matches the doc-index)
+    Handles the splitting of data (data and document representation that is, every data as long the row-index matches the doc-index)
 
     :param data: DataFrame of data
     :param selection_index: selection_index (see dataSample)

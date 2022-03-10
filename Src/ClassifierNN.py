@@ -28,19 +28,28 @@ def classifierNN(sampleTrain: pd.DataFrame, sampleTest: pd.DataFrame, docReprese
     label_col_enc = label_col + "_enc"
     sampleTrain[label_col_enc] = dataEncoding(sampleTrain['labels'], encoding_matrix)
     sampleTest[label_col_enc] = dataEncoding(sampleTest['labels'], encoding_matrix)
-    data[label_col_enc] = dataEncoding(data[label_col], encoding_matrix)
+    #data[label_col_enc] = dataEncoding(data[label_col], encoding_matrix)
+    data_ = pd.DataFrame()
+    data_[label_col] = data
+    data_[label_col_enc] = dataEncoding(data, encoding_matrix)
 
-    model = fitNN(sampleTrain['doc'], sampleTest['doc'], sampleTrain[label_col_enc], sampleTest[label_col_enc], epochs=epochs, batch_size=batch_size, project_name=project_name, plot_title = plot_title)
+    unlist = lambda x: np.array([np.array(i) for i in np.array(x)])
 
-    pred_data = model.predict(np.matrix(docRepresentation).astype('float32'))
+    docTrain = unlist(sampleTrain['doc'])
+    docTest = unlist(sampleTest['doc'])
+    docRepresentation = unlist(docRepresentation)
+
+    model = fitNN(docTrain, docTest, sampleTrain[label_col_enc], sampleTest[label_col_enc], epochs=epochs, batch_size=batch_size, project_name=project_name, plot_title = plot_title)
+
+    pred_data = model.predict(docRepresentation.astype('float32'))
     pred_data = np.array(pred_data).reshape(-1)
     #print(pred_data)
     pred_data_groups = np.floor(pred_data + 0.5).astype('int')
     #print(pred_data)
-    data[str(label_col + prediction_suffix)] = dataDecoder(pred_data_groups, encoding_matrix)
-    data[str(label_col + prob_suffix)] = pred_data
+    data_[str(label_col + prediction_suffix)] = dataDecoder(pred_data_groups, encoding_matrix)
+    data_[str(label_col + prob_suffix)] = pred_data
 
-    return data
+    return data_
 
 
 def fitNN(docRepTrain: pd.DataFrame, docRepTest: pd.DataFrame, labelsTrain: pd.Series, labelsTest: pd.Series, epochs: int=20, batch_size = 128, project_name = "NNClassifier", plot_title = ""):

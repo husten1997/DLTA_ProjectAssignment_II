@@ -73,10 +73,10 @@ w2v_data = convert_to_dic(dataSplit(w2v_sample))
 
 #%% NN Classifier
 # Fit classifier
-data_tfidf_nn = classifierNN(tfidf_data['dataTrain'], tfidf_data['dataTest'], tfidf_doc, data.copy(), encoding_matrix, project_name="NN_tfidf", plot_title="TfIdf - NN Classifier Loss")
-data_lsa_nn = classifierNN(lsa_data['dataTrain'], lsa_data['dataTest'], lsa_doc, data.copy(), encoding_matrix, project_name="NN_lsa", plot_title="LSA - NN Classifier Loss")
-data_glove_nn = classifierNN(glove_data['dataTrain'], glove_data['dataTest'], glove_doc, data.copy(), encoding_matrix, project_name="NN_glove", plot_title="GloVe - NN Classifier Loss")
-data_w2v_nn = classifierNN(w2v_data['dataTrain'], w2v_data['dataTest'], w2v_doc, data.copy(), encoding_matrix, project_name="NN_w2v", plot_title="W2V - NN Classifier Loss")
+data_tfidf_nn = classifierNN(tfidf_data['dataTrain'], tfidf_data['dataTest'], tfidf_doc, data['label_l1'].copy(), encoding_matrix, project_name="NN_tfidf", plot_title="TfIdf - NN Classifier Loss")
+data_lsa_nn = classifierNN(lsa_data['dataTrain'], lsa_data['dataTest'], lsa_doc, data['label_l1'].copy(), encoding_matrix, project_name="NN_lsa", plot_title="LSA - NN Classifier Loss")
+data_glove_nn = classifierNN(glove_data['dataTrain'], glove_data['dataTest'], glove_doc, data['label_l1'].copy(), encoding_matrix, project_name="NN_glove", plot_title="GloVe - NN Classifier Loss")
+data_w2v_nn = classifierNN(w2v_data['dataTrain'], w2v_data['dataTest'], w2v_doc, data['label_l1'].copy(), encoding_matrix, project_name="NN_w2v", plot_title="W2V - NN Classifier Loss")
 
 # Performance Evaluation
 conf_matrix_tfidf = calculateConfusionMatrix(data_tfidf_nn['label_l1'], data_tfidf_nn['label_l1_NNpred'])
@@ -93,10 +93,10 @@ auc_w2v = roc_measure(data_w2v_nn, encoding_matrix, label_true = 'label_l1', lab
 
 #%% Linear Classifier
 # Fit classifier
-data_tfidf_lin = classifierLinear(tfidf_data['dataTrain'], tfidf_doc, data.copy())
-data_lsa_lin = classifierLinear(lsa_data['dataTrain'], lsa_doc, data.copy())
-data_glove_lin = classifierLinear(glove_data['dataTrain'], glove_doc, data.copy())
-data_w2v_lin = classifierLinear(w2v_data['dataTrain'], w2v_doc, data.copy())
+data_tfidf_lin = classifierLinear(tfidf_data['dataTrain'], tfidf_doc, data['label_l1'].copy())
+data_lsa_lin = classifierLinear(lsa_data['dataTrain'], lsa_doc, data['label_l1'].copy())
+data_glove_lin = classifierLinear(glove_data['dataTrain'], glove_doc, data['label_l1'].copy())
+data_w2v_lin = classifierLinear(w2v_data['dataTrain'], w2v_doc, data['label_l1'].copy())
 
 # Performance Evaluation - NN
 conf_matrix_tfidf = calculateConfusionMatrix(data_tfidf_lin['label_l1'], data_tfidf_lin['label_l1_LINpred'])
@@ -142,13 +142,65 @@ for i in tqdm(range(1, nfolds+1)):
 
     # NN Classifier
     # Fit classifier
-    data_tfidf_nn = classifierNN(tfidf_data['dataTrain'], tfidf_data['dataTest'], tfidf_doc, data.copy(), encoding_matrix,
+    data_tfidf_nn = classifierNN(tfidf_data['dataTrain'], tfidf_data['dataTest'], tfidf_doc, data['label_l1'].copy(), encoding_matrix,
                                  project_name="NN_tfidf", plot_title="TfIdf - NN Classifier Loss")
-    data_lsa_nn = classifierNN(lsa_data['dataTrain'], lsa_data['dataTest'], lsa_doc, data.copy(), encoding_matrix,
+    data_lsa_nn = classifierNN(lsa_data['dataTrain'], lsa_data['dataTest'], lsa_doc, data['label_l1'].copy(), encoding_matrix,
                                project_name="NN_lsa", plot_title="LSA - NN Classifier Loss")
-    data_glove_nn = classifierNN(glove_data['dataTrain'], glove_data['dataTest'], glove_doc, data.copy(), encoding_matrix,
+    data_glove_nn = classifierNN(glove_data['dataTrain'], glove_data['dataTest'], glove_doc, data['label_l1'].copy(), encoding_matrix,
                                  project_name="NN_glove", plot_title="GloVe - NN Classifier Loss")
-    data_w2v_nn = classifierNN(w2v_data['dataTrain'], w2v_data['dataTest'], w2v_doc, data.copy(), encoding_matrix,
+    data_w2v_nn = classifierNN(w2v_data['dataTrain'], w2v_data['dataTest'], w2v_doc, data['label_l1'].copy(), encoding_matrix,
+                               project_name="NN_w2v", plot_title="W2V - NN Classifier Loss")
+
+    # Performance Eval
+    resultMatrix.loc['Neural-Network-Classifier', 'TfIdf'] += roc_measure(data_tfidf_nn, encoding_matrix, label_true='label_l1', label_prob='label_l1_NNprob',
+                            plot_title='TfIdf - ROC Curve', plot=False)
+    resultMatrix.loc['Neural-Network-Classifier', 'LSA'] += roc_measure(data_lsa_nn, encoding_matrix, label_true='label_l1', label_prob='label_l1_NNprob',
+                          plot_title='LSA - ROC Curve', plot=False)
+    resultMatrix.loc['Neural-Network-Classifier', 'GloVe'] += roc_measure(data_glove_nn, encoding_matrix, label_true='label_l1', label_prob='label_l1_NNprob',
+                            plot_title='GloVe - ROC Curve', plot=False)
+    resultMatrix.loc['Neural-Network-Classifier', 'Word to Vec'] += roc_measure(data_w2v_nn, encoding_matrix, label_true='label_l1', label_prob='label_l1_NNprob',
+                          plot_title='Word to Vec - ROC Curve', plot=False)
+
+resultMatrix = resultMatrix / nfolds
+
+print(resultMatrix)
+
+#%% Crossvalidation out of sample
+resultMatrix = pd.DataFrame(0, columns=['TfIdf', 'LSA', 'GloVe', 'Word to Vec'], index = ['Linear-Classifier', 'Neural-Network-Classifier'])
+prompt("Starting Cross-Validation")
+for i in tqdm(range(1, nfolds+1)):
+    # Sample Split:
+    tfidf_data = convert_to_dic(dataSplit(tfidf_sample, test_fold=i))
+    lsa_data = convert_to_dic(dataSplit(lsa_sample, test_fold=i))
+    glove_data = convert_to_dic(dataSplit(glove_sample, test_fold=i))
+    w2v_data = convert_to_dic(dataSplit(w2v_sample, test_fold=i))
+
+    # Linear Classifier
+    # Fit classifier
+    data_tfidf_lin = classifierLinear(tfidf_data['dataTrain'], tfidf_data['dataTest']['doc'], tfidf_data['dataTest']['labels'])
+    data_lsa_lin = classifierLinear(lsa_data['dataTrain'], lsa_data['dataTest']['doc'], lsa_data['dataTest']['labels'])
+    data_glove_lin = classifierLinear(glove_data['dataTrain'], glove_data['dataTest']['doc'], glove_data['dataTest']['labels'])
+    data_w2v_lin = classifierLinear(w2v_data['dataTrain'], w2v_data['dataTest']['doc'], w2v_data['dataTest']['labels'])
+
+    # Performance Eval
+    resultMatrix.loc['Linear-Classifier', 'TfIdf'] += roc_measure(data_tfidf_lin, encoding_matrix, label_true='label_l1', label_prob='label_l1_LINprob',
+                            plot_title='TfIdf - ROC Curve', plot=False)
+    resultMatrix.loc['Linear-Classifier', 'LSA'] += roc_measure(data_lsa_lin, encoding_matrix, label_true='label_l1', label_prob='label_l1_LINprob',
+                          plot_title='LSA - ROC Curve', plot=False)
+    resultMatrix.loc['Linear-Classifier', 'GloVe'] += roc_measure(data_glove_lin, encoding_matrix, label_true='label_l1', label_prob='label_l1_LINprob',
+                            plot_title='GloVe - ROC Curve', plot=False)
+    resultMatrix.loc['Linear-Classifier', 'Word to Vec'] += roc_measure(data_w2v_lin, encoding_matrix, label_true='label_l1', label_prob='label_l1_LINprob',
+                          plot_title='Word to Vec - ROC Curve', plot=False)
+
+    # NN Classifier
+    # Fit classifier
+    data_tfidf_nn = classifierNN(tfidf_data['dataTrain'], tfidf_data['dataTest'], tfidf_data['dataTest']['doc'], tfidf_data['dataTest']['labels'], encoding_matrix,
+                                 project_name="NN_tfidf", plot_title="TfIdf - NN Classifier Loss")
+    data_lsa_nn = classifierNN(lsa_data['dataTrain'], lsa_data['dataTest'], lsa_data['dataTest']['doc'], lsa_data['dataTest']['labels'], encoding_matrix,
+                               project_name="NN_lsa", plot_title="LSA - NN Classifier Loss")
+    data_glove_nn = classifierNN(glove_data['dataTrain'], glove_data['dataTest'], glove_data['dataTest']['doc'], glove_data['dataTest']['labels'], encoding_matrix,
+                                 project_name="NN_glove", plot_title="GloVe - NN Classifier Loss")
+    data_w2v_nn = classifierNN(w2v_data['dataTrain'], w2v_data['dataTest'], w2v_data['dataTest']['doc'], w2v_data['dataTest']['labels'], encoding_matrix,
                                project_name="NN_w2v", plot_title="W2V - NN Classifier Loss")
 
     # Performance Eval
