@@ -59,7 +59,7 @@ def roc_measure(data, encoding_matrix, label_true, label_prob, plot_title, plot 
 
         fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
 
-        roc_table.loc[threshold] = threshold/100, fpr[1], tpr[1]
+        roc_table.loc[threshold] = threshold/100, tpr[1], fpr[1]
         area_under_curve = roc_auc_score(y_coi, prop_pred)
 
     if plot == True:
