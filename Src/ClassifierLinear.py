@@ -1,10 +1,24 @@
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
+from Src.prompt import prompt
 
 def classifierLinear(sampleTrain: pd.DataFrame, docRepresentation: pd.DataFrame, data: pd.Series,
                      label_col: str ='label_l1', prediction_suffix: str = "_LINpred", prob_suffix: str = "_LINprob"):
+    """
+    Function for the whole classification process by logistic regression.
 
+    :param sampleTrain: <tbd>
+    :param docRepresentation: complete document representation (can be different from fitting data, i.e. all documents can be used)
+    :param data: complete dataset, can be different from the fitting data
+    :param label_col: name of the target colum
+    :param epochs: number of epochs
+    :param prediction_suffix: suffix for the prediction colum
+    :param prob_suffix: suffix for the probability colum
+    :return: dataframe with the original data plus the colum of predicted label data
+    """
+
+    prompt("Starting Linear Classifier")
     unlist = lambda x: np.array([np.array(i) for i in np.array(x)])
 
     docRepresentation = unlist(docRepresentation)

@@ -71,6 +71,26 @@ lsa_data = convert_to_dic(dataSplit(lsa_sample))
 glove_data = convert_to_dic(dataSplit(glove_sample))
 w2v_data = convert_to_dic(dataSplit(w2v_sample))
 
+#%% Linear Classifier
+# Fit classifier
+data_tfidf_lin = classifierLinear(tfidf_data['dataTrain'], tfidf_doc, data['label_l1'].copy())
+data_lsa_lin = classifierLinear(lsa_data['dataTrain'], lsa_doc, data['label_l1'].copy())
+data_glove_lin = classifierLinear(glove_data['dataTrain'], glove_doc, data['label_l1'].copy())
+data_w2v_lin = classifierLinear(w2v_data['dataTrain'], w2v_doc, data['label_l1'].copy())
+
+# Performance Evaluation
+conf_matrix_tfidf = calculateConfusionMatrix(data_tfidf_lin['label_l1'], data_tfidf_lin['label_l1_LINpred'])
+auc_tfidf = roc_measure(data_tfidf_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'TfIdf - ROC Curve')
+
+conf_matrix_lsa = calculateConfusionMatrix(data_lsa_lin['label_l1'], data_lsa_lin['label_l1_LINpred'])
+auc_lsa = roc_measure(data_lsa_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'LSA - ROC Curve')
+
+conf_matrix_glove = calculateConfusionMatrix(data_glove_lin['label_l1'], data_glove_lin['label_l1_LINpred'])
+auc_glove = roc_measure(data_glove_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'GloVe - ROC Curve')
+
+conf_matrix_w2v = calculateConfusionMatrix(data_w2v_lin['label_l1'], data_w2v_lin['label_l1_LINpred'])
+auc_w2v = roc_measure(data_w2v_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'Word to Vec - ROC Curve')
+
 #%% NN Classifier
 # Fit classifier
 data_tfidf_nn = classifierNN(tfidf_data['dataTrain'], tfidf_data['dataTest'], tfidf_doc, data['label_l1'].copy(), encoding_matrix, project_name="NN_tfidf", plot_title="TfIdf - NN Classifier Loss")
@@ -90,28 +110,6 @@ auc_glove = roc_measure(data_glove_nn, encoding_matrix, label_true = 'label_l1',
 
 conf_matrix_w2v = calculateConfusionMatrix(data_w2v_nn['label_l1'], data_w2v_nn['label_l1_NNpred'])
 auc_w2v = roc_measure(data_w2v_nn, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_NNprob', plot_title = 'Word to Vec - ROC Curve')
-
-#%% Linear Classifier
-# Fit classifier
-data_tfidf_lin = classifierLinear(tfidf_data['dataTrain'], tfidf_doc, data['label_l1'].copy())
-data_lsa_lin = classifierLinear(lsa_data['dataTrain'], lsa_doc, data['label_l1'].copy())
-data_glove_lin = classifierLinear(glove_data['dataTrain'], glove_doc, data['label_l1'].copy())
-data_w2v_lin = classifierLinear(w2v_data['dataTrain'], w2v_doc, data['label_l1'].copy())
-
-# Performance Evaluation - NN
-conf_matrix_tfidf = calculateConfusionMatrix(data_tfidf_lin['label_l1'], data_tfidf_lin['label_l1_LINpred'])
-auc_tfidf = roc_measure(data_tfidf_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'TfIdf - ROC Curve')
-
-conf_matrix_lsa = calculateConfusionMatrix(data_lsa_lin['label_l1'], data_lsa_lin['label_l1_LINpred'])
-auc_lsa = roc_measure(data_lsa_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'LSA - ROC Curve')
-
-conf_matrix_glove = calculateConfusionMatrix(data_glove_lin['label_l1'], data_glove_lin['label_l1_LINpred'])
-auc_glove = roc_measure(data_glove_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'GloVe - ROC Curve')
-
-conf_matrix_w2v = calculateConfusionMatrix(data_w2v_lin['label_l1'], data_w2v_lin['label_l1_LINpred'])
-auc_w2v = roc_measure(data_w2v_lin, encoding_matrix, label_true = 'label_l1', label_prob = 'label_l1_LINprob', plot_title = 'Word to Vec - ROC Curve')
-
-
 
 #%% Crossvalidation
 resultMatrix = pd.DataFrame(0, columns=['TfIdf', 'LSA', 'GloVe', 'Word to Vec'], index = ['Linear-Classifier', 'Neural-Network-Classifier'])
