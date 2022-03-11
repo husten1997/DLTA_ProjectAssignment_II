@@ -47,41 +47,26 @@ def roc_measure(data_true,doc_type, prop_pred, plot: bool, plot_title: str):
         y_coi.append(y)
 
 
-<<<<<<< Updated upstream
-        y_hat = []
-
-        for label in range(len(prop_pred)):
-            y = int(prop_pred[label] >= threshold/100)
-            y_hat.append(y)
-
-        fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
-
-        roc_table.loc[threshold] = threshold/100, tpr[1], fpr[1]
-        area_under_curve = roc_auc_score(y_coi, prop_pred)
-=======
     #calculate measures
     fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = prop_pred)
     area_under_curve = roc_auc_score(y_coi, prop_pred)
->>>>>>> Stashed changes
+
 
     if plot == True:
+        
         #plot ROC curve
         plt.figure()
         lw = 2
         plt.plot(
             fpr,
             tpr,
-            lw = lw,
-            label = f'{plot_title}')
+            lw = lw)
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title(f'{plot_title}')
-<<<<<<< Updated upstream
-=======
         plt.plot([0, max(fpr)], [0, max(tpr)], color="black", lw=lw, linestyle="--", label = "Random classifier")
         plt.legend()
         plt.show()
->>>>>>> Stashed changes
 
     return area_under_curve
 
