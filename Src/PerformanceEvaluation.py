@@ -40,16 +40,14 @@ def roc_measure(data_true,doc_type, prop_pred, plot: bool, plot_title: str):
 
     roc_table = pd.DataFrame(columns = ['threshold', 'TPR', 'FPR'], index = [i for i in range(100)])
 
-    #binarize the data
     y_coi = []
 
     for label in range(data_true.shape[0]):
         y = int(data_true['label_l1'].iloc[label] == doc_type)
         y_coi.append(y)
 
-    #binarize predicted data with probability threshold
-    for threshold in range(101):
 
+<<<<<<< Updated upstream
         y_hat = []
 
         for label in range(len(prop_pred)):
@@ -60,19 +58,30 @@ def roc_measure(data_true,doc_type, prop_pred, plot: bool, plot_title: str):
 
         roc_table.loc[threshold] = threshold/100, tpr[1], fpr[1]
         area_under_curve = roc_auc_score(y_coi, prop_pred)
+=======
+    #calculate measures
+    fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = prop_pred)
+    area_under_curve = roc_auc_score(y_coi, prop_pred)
+>>>>>>> Stashed changes
 
     if plot == True:
         #plot ROC curve
         plt.figure()
         lw = 2
         plt.plot(
-            roc_table['FPR'],
-            roc_table['TPR'],
-            lw = lw
-        )
+            fpr,
+            tpr,
+            lw = lw,
+            label = f'{plot_title}')
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title(f'{plot_title}')
+<<<<<<< Updated upstream
+=======
+        plt.plot([0, max(fpr)], [0, max(tpr)], color="black", lw=lw, linestyle="--", label = "Random classifier")
+        plt.legend()
+        plt.show()
+>>>>>>> Stashed changes
 
     return area_under_curve
 
