@@ -69,6 +69,7 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
     :param word_embedding_dim: dimension of the word-embedding vectors
     :return: tuple of context-word-embedding and target-word-embedding matrix
     """
+    prompt("Starting GloVe algorithm")
     if not exists("Data/GloVe_CoOcMatrix.csv") or overwrite:
         prompt("Starting generation of Co-Occurrence Matrix")
         cooc_matrix = generateCoOccurrenceMatrix(generateContextDic(corpus))

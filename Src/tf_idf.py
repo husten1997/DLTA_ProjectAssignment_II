@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
+from Src.prompt import prompt
 
 def tf_idf(corpus: Iterable):
     """
@@ -10,6 +11,7 @@ def tf_idf(corpus: Iterable):
     :return: tf-idf matrix as dataframe
     """
 
+    prompt("Starting TfIdf algorithm")
     tfidf_vec = TfidfVectorizer()
     tfidf = tfidf_vec.fit_transform(corpus)
 
