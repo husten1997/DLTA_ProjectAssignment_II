@@ -3,11 +3,13 @@ from sklearn.decomposition import TruncatedSVD
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 def LSA(corpus: Iterable, input_mat: Iterable):
     """
     Function which generates a LSA representation of the corpus.
 
     :param corpus: Iterable/list/array or pd.Series which holds the tf-idf matrix
+    :param input_mat: word-document matrix
     :return: LSA matrix
     """
 
@@ -20,7 +22,8 @@ def LSA(corpus: Iterable, input_mat: Iterable):
 
     return df_lsa
 
-def getNumbTopics(input_mat: Iterable):
+
+def getNumbTopics(input_mat: Iterable) -> int:
     """
     Function which determines the appropriate number of components.
 
@@ -46,6 +49,7 @@ def getNumbTopics(input_mat: Iterable):
     plotExplainedVariance(steps, list_var_explained)
 
     return numb_topics
+
 
 def plotExplainedVariance(steps, list_variance_explained):
     """

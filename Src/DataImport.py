@@ -74,7 +74,7 @@ def DataDownload() -> pd.DataFrame:
     "label-group" ("label-group" refers to the 3, 4 or 5 labels which are closest to each other) and selects the
     label-name to one of the for label-stages (QID/AID, label_l1, label_l2, label_l3). If more than 1 label is present
     for one label stage (for example if a question has two times question_3_* labels) in a first step the algorithm
-    tries to use np.unique to see if the two question_3_* labels are actually different. If thats the case, one can just
+    tries to use np.unique to see if the two question_3_* labels are actually different. If that's the case, one can just
     use one of the two labels without loss of information. If that's NOT the case, one has to choose to drop information
     (then only the FIRST of the two labels is used) or include the information (then an array of the two labels is used,
     which obviously breaks the unique labeling if each text).
@@ -139,7 +139,6 @@ def DataDownload() -> pd.DataFrame:
     data_all_raw['label_l3'] = []
 
     for t in range(0, len(tasks)):
-        #print(t)
         # Acquire Raw Data
         data_raw = {}
         data_raw['docID'] = []
@@ -158,7 +157,7 @@ def DataDownload() -> pd.DataFrame:
         data = pd.DataFrame(data_raw)
         data['id'] = list(range(0, data.shape[0]))
 
-        # Create Dis Matrix
+        # Create distance Matrix
         start_vec = np.array(data['start']).reshape((-1, 1))
         helper = np.ones(len(start_vec)).reshape((1, -1))
 
@@ -180,7 +179,6 @@ def DataDownload() -> pd.DataFrame:
         # Create dic with the values
         for e in grouping_vec:
             helper = data.loc[e, :]
-            # print(helper)
             data_all_raw['docID'].append(tasks[t]['id'])
             data_all_raw['start'].append(helper['start'].min())
             data_all_raw['end'].append(helper['start'].max())

@@ -22,7 +22,7 @@ from imblearn.over_sampling import RandomOverSampler, SMOTE, BorderlineSMOTE, AD
 #               the index is replaces by a new index. If the old index is import it can be saved as column of
 #               the DataFrame
 
-def dataCheck(data: pd.DataFrame, keepNA: str = False, keepOldIDs: str = False) -> pd.DataFrame:
+def dataCheck(data: pd.DataFrame, keepNA: bool = False, keepOldIDs: bool = False) -> pd.DataFrame:
     """
     Checks the data for missing values (na) and (optionally) removes them.
 
@@ -292,7 +292,8 @@ def dataSample(documentRep: pd.DataFrame, data: pd.DataFrame, method: str, n: in
     :param method: method of sampling ('undersample', 'resample')
     :param n: desired length of sampled data (obsolete for undersampling because the number of samples of the smallest group is set as n)
     :param col: name of the target column
-    :return: DataFrame of document representation in 'doc'-column and labels in 'labels'-column
+    :param folds: Number of folds the data should be devided in. The fold number is determined by "sample draw without replacement" and is added as integer column to the resulting dataframe
+    :return: DataFrame of document representation in 'doc'-column and labels in 'labels'-column and the fold number in the 'fold'-column
     """
     labels = np.unique(data[col])
     label_counts = {}
@@ -349,8 +350,7 @@ def dataSplit(data: pd.DataFrame, test_fold = 10):
     Handles the splitting of data (data and document representation that is, every data as long the row-index matches the doc-index)
 
     :param data: DataFrame of data
-    :param selection_index: selection_index (see dataSample)
-    :param train_split_frac: fraction of the data which should be considered for the train dataset
+    :param test_fold: number of the fold, that should be used for the test data
     :return: tuple of train and test data
     """
     data = data.sample(frac=1)

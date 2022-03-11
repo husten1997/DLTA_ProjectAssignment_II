@@ -1,7 +1,7 @@
 import pandas as pd
 import tensorflow as tf
 
-def docPresentation(corpus, vector_size, embedding_matrix):
+def docPresentation(corpus: pd.Series, vector_size, embedding_matrix):
     '''
     :param corpus: raw data which includes the preprocessed text
     :param vector_size: the vector size which is used for the word embedding

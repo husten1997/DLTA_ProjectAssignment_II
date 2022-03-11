@@ -87,7 +87,6 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
     bias_context_vec = np.random.normal(size = len(cooc_matrix.index), scale = 0.25).reshape(len(cooc_matrix.index), 1)
     bias_target_vec = np.random.normal(size=len(cooc_matrix.index), scale=0.25).reshape(len(cooc_matrix.index), 1)
     iota = np.ones((len(cooc_matrix.index), 1))
-    #iota = np.matrix([1 for i in range(len(cooc_matrix.index))]).reshape(len(cooc_matrix.index), 1)
 
     target_matrix = np.array(target_matrix, dtype = np.float64)
     context_matrix = np.array(context_matrix, dtype=np.float64)
@@ -105,6 +104,7 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
         weights = np.ones(cooc_matrix.shape)
 
     def calLoss(weights, cooc_matrix, target_matrix, context_matrix, bias_context_vec, bias_target_vec):
+        """Calculates the loss"""
         J = np.matrix(np.multiply(weights, (np.matmul(target_matrix,  np.transpose(context_matrix)) + np.matmul(bias_context_vec, np.transpose(iota)) + np.matmul(bias_target_vec, np.transpose(iota)) - np.log(cooc_matrix.to_numpy()))**2)).flatten().sum()
 
         return J
@@ -127,7 +127,6 @@ def GloVe(corpus: Iterable, overwrite: bool = False, eta: float = 0.00001, eta_b
 
         loss_series.append(calLoss(weights, cooc_matrix, target_matrix, context_matrix, bias_context_vec, bias_target_vec))
 
-    #print(loss_series)
     plt.plot(pd.Series(loss_series).T)
     plt.xlabel("Epochs")
     plt.ylabel("Loss")

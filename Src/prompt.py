@@ -14,6 +14,7 @@ def prompt(message: str, formatter = 'plain', promt_length = 80):
 
 
 def messageFormatter(message: str, prompt_length, fill_char ="-"):
+    """Function which formats the input string"""
     message = " " + message.strip() + " "
     fill_length = (prompt_length - len(message)) / 2
     prefix = str(fill_char * floor(fill_length))

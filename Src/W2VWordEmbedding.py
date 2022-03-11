@@ -70,9 +70,10 @@ def w2v_tensor(window_size, min_count, sg, vector_size):
     return doc_tensor
 
 
-def w2v_matrix(corpus,window_size, min_count, sg, vector_size):
-
+def w2v_matrix(corpus: pd.Series, window_size: int, min_count: int, sg: int, vector_size: int):
     '''
+    Function which handles the fitting of the word-to-vec algorithm.
+
     :param data: data which includes the preprocessed text
     :param window_size: window_size which is used for the w2c model
     :param min_count: minimum of count to be counted as

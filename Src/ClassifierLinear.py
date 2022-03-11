@@ -3,12 +3,13 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from Src.prompt import prompt
 
+
 def classifierLinear(sampleTrain: pd.DataFrame, docRepresentation: pd.DataFrame, data: pd.Series,
-                     label_col: str ='label_l1', prediction_suffix: str = "_LINpred", prob_suffix: str = "_LINprob"):
+                     label_col: str = 'label_l1', prediction_suffix: str = "_LINpred", prob_suffix: str = "_LINprob"):
     """
     Function for the whole classification process by logistic regression.
 
-    :param sampleTrain: <tbd>
+    :param sampleTrain: pd.DataFrame containing a column for the document representation of the train data and a colum for the labels of the train data
     :param docRepresentation: complete document representation (can be different from fitting data, i.e. all documents can be used)
     :param data: complete dataset, can be different from the fitting data
     :param label_col: name of the target colum
@@ -23,8 +24,6 @@ def classifierLinear(sampleTrain: pd.DataFrame, docRepresentation: pd.DataFrame,
 
     docRepresentation = unlist(docRepresentation)
     docRepTrain = unlist(sampleTrain['doc'])
-    #docRepTrain = np.array([np.array(i) for i in docRepTrain])
-
 
     X_train = np.array(docRepTrain)
     X_test = np.array(docRepresentation)

@@ -6,7 +6,7 @@ from sklearn.metrics import roc_curve, auc, roc_auc_score
 import matplotlib.pylab as plt
 
 
-def calculateConfusionMatrix(data_true: pd.Series, data_pred: pd.Series, freq: bool = True):
+def calculateConfusionMatrix(data_true: pd.Series, data_pred: pd.Series, freq: bool = True) -> pd.DataFrame:
     """
     Wrapper function for sklearn.metrics.confusion_matrix. It can additionally handle frequency representation of the confusion matrix.
 
@@ -24,18 +24,17 @@ def calculateConfusionMatrix(data_true: pd.Series, data_pred: pd.Series, freq: b
     return con
 
 
-def plotROC(data_true: pd.Series, data_pred: pd.Series):
-    None
-
-
-
-def roc_measure(data, encoding_matrix, label_true, label_prob, plot_title, plot = True):
-
+def roc_measure(data: pd.DataFrame, encoding_matrix: pd.DataFrame, label_true: str, label_prob: str, plot_title: str, plot: bool = True):
     '''
-    :param data_true: data which includes the label column 'label_l1'
-    :param doc_type: Question or Answer Label which shall be classified as 1
-    :param prop_pred: predictions of a classifier with probabilities as output
-    :return: roc table, roc curve and area under the curve per probability
+    Function which handles the plot of the ROC curve as well as calculating and returning the area under the curve.
+
+    :param data: pd.DataFrame with all the data, but has to contain on column with the true labels and one column with the predicted probabilities
+    :param encoding_matrix: encoding matrix
+    :param label_true: Name of the column which contains the true labels
+    :param label_prob: Name of the colum which contains the predicted probabilities
+    :param plot_title: Title of the ROC plot
+    :param plot: boolean if a plot should be generated or not
+    :return: area under the curve per probability
     '''
     data_true = data[label_true]
     prop_pred = data[label_prob]
@@ -62,7 +61,7 @@ def roc_measure(data, encoding_matrix, label_true, label_prob, plot_title, plot 
         roc_table.loc[threshold] = threshold/100, tpr[1], fpr[1]
         area_under_curve = roc_auc_score(y_coi, prop_pred)
 
-    if plot == True:
+    if plot:
         #plot ROC curve
         plt.figure()
         lw = 2
