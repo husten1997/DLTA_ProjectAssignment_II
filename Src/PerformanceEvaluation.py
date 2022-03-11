@@ -38,7 +38,6 @@ def roc_measure(data: pd.DataFrame, encoding_matrix: pd.DataFrame, label_true: s
     '''
     data_true = data[label_true]
     prop_pred = data[label_prob]
-    roc_table = pd.DataFrame(columns = ['threshold', 'TPR', 'FPR'], index = [i for i in range(100)])
 
     #binarize the data
     y_coi = []
@@ -47,29 +46,20 @@ def roc_measure(data: pd.DataFrame, encoding_matrix: pd.DataFrame, label_true: s
         y = int(data_true.iloc[label] == encoding_matrix.set_index('index').loc[1, 'value'])
         y_coi.append(y)
 
-    #binarize predicted data with probability threshold
-    for threshold in range(101):
-
-        y_hat = []
-
-        for label in range(len(prop_pred)):
-            y = int(prop_pred.iloc[label] >= threshold/100)
-            y_hat.append(y)
-
-        fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = y_hat)
-
-        roc_table.loc[threshold] = threshold/100, tpr[1], fpr[1]
-        area_under_curve = roc_auc_score(y_coi, prop_pred)
+    #calculate ROC and AUC measures
+    fpr, tpr, _ = roc_curve(y_true = y_coi, y_score = prop_pred)
+    area_under_curve = roc_auc_score(y_coi, prop_pred)
 
     if plot:
         #plot ROC curve
         plt.figure()
         lw = 2
         plt.plot(
-            roc_table['FPR'],
-            roc_table['TPR'],
+            fpr,
+            tpr,
             lw = lw
         )
+        plt.plot([0, max(fpr)], [0, max(tpr)], color="black", lw=lw, linestyle="--")
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
         plt.title(f'{plot_title}')
